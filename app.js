@@ -2,13 +2,17 @@ import "dotenv/config";
 import express from "express";
 import process from "node:process";
 import { connectDb } from "./src/config/db.js";
+import { setupSwagger } from "./src/config/swagger.js";
 import { errorHandler, notFoundHandler } from "./src/middlewares/errorHandler.js";
+import apiRoutes from "./src/routes/index.js";
 import { logger, requestFlowLogger } from "./src/utils/logger.js";
 
 const app = express();
 app.disable("x-powered-by");
 app.use(express.json());
 app.use(requestFlowLogger);
+setupSwagger(app);
+app.use("/api", apiRoutes);
 app.use(notFoundHandler);
 app.use(errorHandler);
 
