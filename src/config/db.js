@@ -30,3 +30,12 @@ export function getDb() {
   }
   return db;
 }
+
+export async function closeDb() {
+  if (client) {
+    await client.close();
+    client = null;
+    db = null;
+    console.log("Disconnected from MongoDB");
+  }
+}

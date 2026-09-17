@@ -1,9 +1,10 @@
+import { Long } from "mongodb";
 import { createTimestamps } from "../utils/timestamps.js";
 
 export const userSchemaValidator = {
   $jsonSchema: {
     bsonType: "object",
-    required: ["name", "availableBalance", "escrowBalance", "createdAt", "updatedAt"],
+    required: ["name", "availableBalance", "createdAt", "updatedAt"],
     properties: {
       name: {
         bsonType: "string",
@@ -17,10 +18,6 @@ export const userSchemaValidator = {
         bsonType: ["string", "null"]
       },
       availableBalance: {
-        bsonType: "long",
-        minimum: 0
-      },
-      escrowBalance: {
         bsonType: "long",
         minimum: 0
       },
@@ -50,8 +47,7 @@ export function createUserDocument({
     name: name.trim(),
     walletAddress: walletAddress ? walletAddress.toLowerCase().trim() : null,
     telegramId: telegramId ? String(telegramId).trim() : null,
-    availableBalance: initialBalanceGrams,
-    escrowBalance: 0,
+    availableBalance: Long.fromNumber(initialBalanceGrams),
     ...createTimestamps()
   };
 }

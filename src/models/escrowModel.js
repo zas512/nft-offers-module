@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { Int32, Long, ObjectId } from "mongodb";
 import { createTimestamps } from "../utils/timestamps.js";
 
 export const ESCROW_STATUSES = Object.freeze(["held", "settled", "refunded", "cancelled"]);
@@ -6,7 +6,16 @@ export const ESCROW_STATUSES = Object.freeze(["held", "settled", "refunded", "ca
 export const escrowSchemaValidator = {
   $jsonSchema: {
     bsonType: "object",
-    required: ["offerId", "buyerId", "grossAmountGrams", "status", "createdAt", "updatedAt"],
+    required: [
+      "offerId",
+      "buyerId",
+      "grossAmountGrams",
+      "platformFeeBps",
+      "royaltyFeeBps",
+      "status",
+      "createdAt",
+      "updatedAt"
+    ],
     properties: {
       offerId: {
         bsonType: "objectId"
@@ -17,9 +26,22 @@ export const escrowSchemaValidator = {
       sellerId: {
         bsonType: ["objectId", "null"]
       },
+      creatorId: {
+        bsonType: ["objectId", "null"]
+      },
       grossAmountGrams: {
         bsonType: "long",
         minimum: 0
+      },
+      platformFeeBps: {
+        bsonType: "int",
+        minimum: 0,
+        maximum: 10000
+      },
+      royaltyFeeBps: {
+        bsonType: "int",
+        minimum: 0,
+        maximum: 10000
       },
       status: {
         bsonType: "string",
@@ -52,7 +74,10 @@ export function createEscrowDocument({
   offerId,
   buyerId,
   sellerId = null,
+  creatorId = null,
   grossAmountGrams,
+  platformFeeBps = 0,
+  royaltyFeeBps = 0,
   status = "held",
   settledAt = null
 }) {
@@ -65,12 +90,31 @@ export function createEscrowDocument({
   if (sellerId && !ObjectId.isValid(sellerId)) {
     throw new Error("INVALID_SELLER_ID");
   }
+  if (creatorId && !ObjectId.isValid(creatorId)) {
+    throw new Error("INVALID_CREATOR_ID");
+  }
   if (
     typeof grossAmountGrams !== "number" ||
     grossAmountGrams <= 0 ||
     !Number.isSafeInteger(grossAmountGrams)
   ) {
     throw new Error("INVALID_GROSS_AMOUNT");
+  }
+  if (
+    typeof platformFeeBps !== "number" ||
+    platformFeeBps < 0 ||
+    platformFeeBps > 10000 ||
+    !Number.isInteger(platformFeeBps)
+  ) {
+    throw new Error("INVALID_PLATFORM_FEE_BPS");
+  }
+  if (
+    typeof royaltyFeeBps !== "number" ||
+    royaltyFeeBps < 0 ||
+    royaltyFeeBps > 10000 ||
+    !Number.isInteger(royaltyFeeBps)
+  ) {
+    throw new Error("INVALID_ROYALTY_FEE_BPS");
   }
   if (!ESCROW_STATUSES.includes(status)) {
     throw new Error("INVALID_STATUS");
@@ -79,7 +123,10 @@ export function createEscrowDocument({
     offerId: toObjectId(offerId),
     buyerId: toObjectId(buyerId),
     sellerId: toObjectId(sellerId),
-    grossAmountGrams,
+    creatorId: toObjectId(creatorId),
+    grossAmountGrams: Long.fromNumber(grossAmountGrams),
+    platformFeeBps: new Int32(platformFeeBps),
+    royaltyFeeBps: new Int32(royaltyFeeBps),
     status,
     settledAt: parseSettledAt(settledAt),
     ...createTimestamps()

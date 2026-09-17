@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { Int32, ObjectId } from "mongodb";
 import { createTimestamps } from "../utils/timestamps.js";
 
 export const collectionSchemaValidator = {
@@ -61,8 +61,8 @@ export function createCollectionDocument({
   return {
     name: name.trim(),
     creatorId: typeof creatorId === "string" ? new ObjectId(creatorId) : creatorId,
-    platformFeeBps,
-    royaltyFeeBps,
+    platformFeeBps: new Int32(platformFeeBps),
+    royaltyFeeBps: new Int32(royaltyFeeBps),
     ...createTimestamps()
   };
 }

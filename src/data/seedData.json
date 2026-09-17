@@ -1,0 +1,491 @@
+{
+  "users": [
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a101",
+      "name": "AetherWhale",
+      "walletAddress": "0x1111111111111111111111111111111111111111",
+      "telegramId": "100000001",
+      "availableBalance": 1000000,
+      "createdAt": "2026-01-10T00:00:00.000Z",
+      "updatedAt": "2026-01-10T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a102",
+      "name": "CyberCollector",
+      "walletAddress": "0x2222222222222222222222222222222222222222",
+      "telegramId": "100000002",
+      "availableBalance": 250000,
+      "createdAt": "2026-01-11T00:00:00.000Z",
+      "updatedAt": "2026-01-11T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a103",
+      "name": "PixelVault",
+      "walletAddress": "0x3333333333333333333333333333333333333333",
+      "telegramId": null,
+      "availableBalance": 85000,
+      "createdAt": "2026-01-12T00:00:00.000Z",
+      "updatedAt": "2026-01-12T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a104",
+      "name": "SatoshiTrader",
+      "walletAddress": "0x4444444444444444444444444444444444444444",
+      "telegramId": "100000004",
+      "availableBalance": 15000,
+      "createdAt": "2026-01-13T00:00:00.000Z",
+      "updatedAt": "2026-01-13T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a105",
+      "name": "MidTierFlipper",
+      "walletAddress": "0x5555555555555555555555555555555555555555",
+      "telegramId": "100000005",
+      "availableBalance": 5000,
+      "createdAt": "2026-01-14T00:00:00.000Z",
+      "updatedAt": "2026-01-14T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a106",
+      "name": "StudioApex",
+      "walletAddress": "0x6666666666666666666666666666666666666666",
+      "telegramId": "100000006",
+      "availableBalance": 3200,
+      "createdAt": "2026-01-15T00:00:00.000Z",
+      "updatedAt": "2026-01-15T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a107",
+      "name": "MetaForgeLab",
+      "walletAddress": "0x7777777777777777777777777777777777777777",
+      "telegramId": null,
+      "availableBalance": 12000,
+      "createdAt": "2026-01-16T00:00:00.000Z",
+      "updatedAt": "2026-01-16T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a108",
+      "name": "ChronoArtisan",
+      "walletAddress": "0x8888888888888888888888888888888888888888",
+      "telegramId": "100000008",
+      "availableBalance": 750,
+      "createdAt": "2026-01-17T00:00:00.000Z",
+      "updatedAt": "2026-01-17T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a109",
+      "name": "VectorCraft",
+      "walletAddress": "0x9999999999999999999999999999999999999999",
+      "telegramId": "100000009",
+      "availableBalance": 400,
+      "createdAt": "2026-01-18T00:00:00.000Z",
+      "updatedAt": "2026-01-18T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a110",
+      "name": "PixelMonk",
+      "walletAddress": "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "telegramId": null,
+      "availableBalance": 1850,
+      "createdAt": "2026-01-19T00:00:00.000Z",
+      "updatedAt": "2026-01-19T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a111",
+      "name": "CasualGamer99",
+      "walletAddress": "0xbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "telegramId": "100000011",
+      "availableBalance": 90,
+      "createdAt": "2026-01-20T00:00:00.000Z",
+      "updatedAt": "2026-01-20T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a112",
+      "name": "RookieSniper",
+      "walletAddress": "0xcccccccccccccccccccccccccccccccccccccccc",
+      "telegramId": "100000012",
+      "availableBalance": 35,
+      "createdAt": "2026-01-21T00:00:00.000Z",
+      "updatedAt": "2026-01-21T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a113",
+      "name": "LootHunter",
+      "walletAddress": null,
+      "telegramId": "100000013",
+      "availableBalance": 10,
+      "createdAt": "2026-01-22T00:00:00.000Z",
+      "updatedAt": "2026-01-22T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a114",
+      "name": "BrokeHodler",
+      "walletAddress": "0xdddddddddddddddddddddddddddddddddddddddd",
+      "telegramId": "100000014",
+      "availableBalance": 0,
+      "createdAt": "2026-01-23T00:00:00.000Z",
+      "updatedAt": "2026-01-23T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1a1a1a1a1a1a1a1a1a115",
+      "name": "ZeroBalanceNewbie",
+      "walletAddress": "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "telegramId": null,
+      "availableBalance": 0,
+      "createdAt": "2026-01-24T00:00:00.000Z",
+      "updatedAt": "2026-01-24T00:00:00.000Z"
+    }
+  ],
+  "collections": [
+    {
+      "_id": "65f1b2b2b2b2b2b2b2b2b201",
+      "name": "Cyber Relics",
+      "creatorId": "65f1a1a1a1a1a1a1a1a1a106",
+      "platformFeeBps": 250,
+      "royaltyFeeBps": 500,
+      "createdAt": "2026-02-01T00:00:00.000Z",
+      "updatedAt": "2026-02-01T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1b2b2b2b2b2b2b2b2b202",
+      "name": "Voxel Beasts",
+      "creatorId": "65f1a1a1a1a1a1a1a1a1a107",
+      "platformFeeBps": 250,
+      "royaltyFeeBps": 750,
+      "createdAt": "2026-02-02T00:00:00.000Z",
+      "updatedAt": "2026-02-02T00:00:00.000Z"
+    }
+  ],
+  "nfts": [
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c301",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b201",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a101",
+      "tokenId": 1,
+      "name": "Cyber Relic #1",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c302",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b201",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a102",
+      "tokenId": 2,
+      "name": "Cyber Relic #2",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c303",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b201",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a103",
+      "tokenId": 3,
+      "name": "Cyber Relic #3",
+      "status": "listed",
+      "isLocked": false,
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c304",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b201",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a104",
+      "tokenId": 4,
+      "name": "Cyber Relic #4",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c305",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b201",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a105",
+      "tokenId": 5,
+      "name": "Cyber Relic #5",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c306",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b201",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a108",
+      "tokenId": 6,
+      "name": "Cyber Relic #6",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c307",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b201",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a109",
+      "tokenId": 7,
+      "name": "Cyber Relic #7",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c308",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b201",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a110",
+      "tokenId": 8,
+      "name": "Cyber Relic #8",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c309",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b201",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a111",
+      "tokenId": 9,
+      "name": "Cyber Relic #9",
+      "status": "listed",
+      "isLocked": false,
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c310",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b201",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a114",
+      "tokenId": 10,
+      "name": "Cyber Relic #10",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-01T00:00:00.000Z",
+      "updatedAt": "2026-03-01T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c311",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a102",
+      "tokenId": 1,
+      "name": "Voxel Beast #1",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c312",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a102",
+      "tokenId": 2,
+      "name": "Voxel Beast #2",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c313",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a102",
+      "tokenId": 3,
+      "name": "Voxel Beast #3",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c314",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a102",
+      "tokenId": 4,
+      "name": "Voxel Beast #4",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c315",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a102",
+      "tokenId": 5,
+      "name": "Voxel Beast #5",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c316",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a102",
+      "tokenId": 6,
+      "name": "Voxel Beast #6",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c317",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a102",
+      "tokenId": 7,
+      "name": "Voxel Beast #7",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c318",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a102",
+      "tokenId": 8,
+      "name": "Voxel Beast #8",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c319",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a102",
+      "tokenId": 9,
+      "name": "Voxel Beast #9",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c320",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a102",
+      "tokenId": 10,
+      "name": "Voxel Beast #10",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c321",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a103",
+      "tokenId": 11,
+      "name": "Voxel Beast #11",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c322",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a104",
+      "tokenId": 12,
+      "name": "Voxel Beast #12",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c323",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a105",
+      "tokenId": 13,
+      "name": "Voxel Beast #13",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c324",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a108",
+      "tokenId": 14,
+      "name": "Voxel Beast #14",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c325",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a109",
+      "tokenId": 15,
+      "name": "Voxel Beast #15",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c326",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a110",
+      "tokenId": 16,
+      "name": "Voxel Beast #16",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c327",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a111",
+      "tokenId": 17,
+      "name": "Voxel Beast #17",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c328",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a112",
+      "tokenId": 18,
+      "name": "Voxel Beast #18",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c329",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a113",
+      "tokenId": 19,
+      "name": "Voxel Beast #19",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    },
+    {
+      "_id": "65f1c3c3c3c3c3c3c3c3c330",
+      "collectionId": "65f1b2b2b2b2b2b2b2b2b202",
+      "ownerId": "65f1a1a1a1a1a1a1a1a1a114",
+      "tokenId": 20,
+      "name": "Voxel Beast #20",
+      "status": "active",
+      "isLocked": false,
+      "createdAt": "2026-03-02T00:00:00.000Z",
+      "updatedAt": "2026-03-02T00:00:00.000Z"
+    }
+  ]
+}

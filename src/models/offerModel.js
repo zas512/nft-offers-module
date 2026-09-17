@@ -1,14 +1,21 @@
-import { ObjectId } from "mongodb";
+import { Long, ObjectId } from "mongodb";
 import { createTimestamps } from "../utils/timestamps.js";
 
 export const OFFER_TYPES = Object.freeze(["item", "collection"]);
-export const OFFER_STATUSES = Object.freeze(["pending", "accepted", "cancelled", "expired"]);
+export const OFFER_STATUSES = Object.freeze([
+  "pending",
+  "accepted",
+  "cancelled",
+  "expired",
+  "invalidated"
+]);
 
 export const offerSchemaValidator = {
   $jsonSchema: {
     bsonType: "object",
     required: [
       "buyerId",
+      "escrowId",
       "collectionId",
       "type",
       "grossAmountGrams",
@@ -22,7 +29,7 @@ export const offerSchemaValidator = {
         bsonType: "objectId"
       },
       escrowId: {
-        bsonType: ["objectId", "null"]
+        bsonType: "objectId"
       },
       collectionId: {
         bsonType: "objectId"
@@ -40,7 +47,7 @@ export const offerSchemaValidator = {
       },
       status: {
         bsonType: "string",
-        enum: ["pending", "accepted", "cancelled", "expired"]
+        enum: ["pending", "accepted", "cancelled", "expired", "invalidated"]
       },
       expiresAt: { bsonType: "date" },
       createdAt: { bsonType: "date" },
@@ -60,11 +67,11 @@ function validateOfferIds({ buyerId, collectionId, escrowId, nftId }) {
   if (!buyerId || !ObjectId.isValid(buyerId)) {
     throw new Error("INVALID_BUYER_ID");
   }
+  if (!escrowId || !ObjectId.isValid(escrowId)) {
+    throw new Error("INVALID_ESCROW_ID");
+  }
   if (!collectionId || !ObjectId.isValid(collectionId)) {
     throw new Error("INVALID_COLLECTION_ID");
-  }
-  if (escrowId && !ObjectId.isValid(escrowId)) {
-    throw new Error("INVALID_ESCROW_ID");
   }
   if (nftId && !ObjectId.isValid(nftId)) {
     throw new Error("INVALID_NFT_ID");
@@ -104,7 +111,7 @@ function parseExpirationDate(expiresAt) {
 export function createOfferDocument({
   buyerId,
   collectionId,
-  escrowId = null,
+  escrowId,
   nftId = null,
   type = "item",
   grossAmountGrams,
@@ -121,7 +128,7 @@ export function createOfferDocument({
     collectionId: toObjectId(collectionId),
     nftId: toObjectId(nftId),
     type,
-    grossAmountGrams,
+    grossAmountGrams: Long.fromNumber(grossAmountGrams),
     status,
     expiresAt: expirationDate,
     ...createTimestamps()

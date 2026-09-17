@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { Int32, ObjectId } from "mongodb";
 import { createTimestamps } from "../utils/timestamps.js";
 
 export const NFT_STATUSES = Object.freeze(["active", "listed", "burned", "transferred"]);
@@ -74,7 +74,7 @@ export function createNftDocument({
   return {
     collectionId: typeof collectionId === "string" ? new ObjectId(collectionId) : collectionId,
     ownerId: typeof ownerId === "string" ? new ObjectId(ownerId) : ownerId,
-    tokenId,
+    tokenId: new Int32(tokenId),
     name: name.trim(),
     status,
     isLocked,

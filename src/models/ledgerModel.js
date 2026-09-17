@@ -1,4 +1,4 @@
-import { ObjectId } from "mongodb";
+import { Long, ObjectId } from "mongodb";
 import { getCurrentTimestamp } from "../utils/timestamps.js";
 
 export const LEDGER_DIRECTIONS = Object.freeze(["credit", "debit"]);
@@ -6,13 +6,13 @@ export const LEDGER_DIRECTIONS = Object.freeze(["credit", "debit"]);
 export const ledgerSchemaValidator = {
   $jsonSchema: {
     bsonType: "object",
-    required: ["referenceId", "userId", "account", "type", "direction", "amountGrams", "createdAt"],
+    required: ["referenceId", "account", "type", "direction", "amountGrams", "createdAt"],
     properties: {
       referenceId: {
         bsonType: "objectId"
       },
       userId: {
-        bsonType: "objectId"
+        bsonType: ["objectId", "null"]
       },
       account: {
         bsonType: "string",
@@ -37,9 +37,16 @@ export const ledgerSchemaValidator = {
   }
 };
 
+function toObjectId(id) {
+  if (!id) {
+    return null;
+  }
+  return typeof id === "string" ? new ObjectId(id) : id;
+}
+
 export function createLedgerDocument({
   referenceId,
-  userId,
+  userId = null,
   account,
   type,
   direction,
@@ -48,7 +55,7 @@ export function createLedgerDocument({
   if (!referenceId || !ObjectId.isValid(referenceId)) {
     throw new Error("INVALID_REFERENCE_ID");
   }
-  if (!userId || !ObjectId.isValid(userId)) {
+  if (userId && !ObjectId.isValid(userId)) {
     throw new Error("INVALID_USER_ID");
   }
   if (!account || typeof account !== "string" || !account.trim()) {
@@ -65,11 +72,11 @@ export function createLedgerDocument({
   }
   return {
     referenceId: typeof referenceId === "string" ? new ObjectId(referenceId) : referenceId,
-    userId: typeof userId === "string" ? new ObjectId(userId) : userId,
+    userId: toObjectId(userId),
     account: account.trim(),
     type: type.trim(),
     direction,
-    amountGrams,
+    amountGrams: Long.fromNumber(amountGrams),
     createdAt: getCurrentTimestamp()
   };
 }
