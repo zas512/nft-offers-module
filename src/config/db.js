@@ -31,6 +31,13 @@ export function getDb() {
   return db;
 }
 
+export function getClient() {
+  if (!client) {
+    throw new Error("Database client is not connected.");
+  }
+  return client;
+}
+
 export async function closeDb() {
   if (client) {
     await client.close();
