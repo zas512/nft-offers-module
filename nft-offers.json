@@ -1,0 +1,293 @@
+{
+  "info": {
+    "_postman_id": "a8f1b2c3-d4e5-4f6a-8b9c-0d1e2f3a4b5c",
+    "name": "NFT Offers API Module",
+    "description": "Complete Postman collection for the NFT Offers API marketplace, covering Users, Collections, NFTs, and Escrow-Backed Offer Workflows.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "buyerId",
+      "value": "65f1a1a1a1a1a1a1a1a1a101",
+      "type": "string"
+    },
+    {
+      "key": "sellerId",
+      "value": "65f1a1a1a1a1a1a1a1a1a102",
+      "type": "string"
+    },
+    {
+      "key": "nftId",
+      "value": "65f1c3c3c3c3c3c3c3c3c302",
+      "type": "string"
+    },
+    {
+      "key": "collectionId",
+      "value": "65f1b2b2b2b2b2b2b2b2b201",
+      "type": "string"
+    },
+    {
+      "key": "offerId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Retrieves list of all registered users."
+          }
+        },
+        {
+          "name": "Get All Users With NFTs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/with-nfts",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "with-nfts"]
+            },
+            "description": "Retrieves list of all users along with their owned NFTs ($lookup aggregation)."
+          }
+        },
+        {
+          "name": "Get User By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{buyerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{buyerId}}"]
+            },
+            "description": "Retrieves a single user by their 24-character ObjectId."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Collections",
+      "item": [
+        {
+          "name": "Get All Collections",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/collections",
+              "host": ["{{baseUrl}}"],
+              "path": ["collections"]
+            },
+            "description": "Retrieves all NFT collections."
+          }
+        },
+        {
+          "name": "Get All Collections With NFTs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/collections/with-nfts",
+              "host": ["{{baseUrl}}"],
+              "path": ["collections", "with-nfts"]
+            },
+            "description": "Retrieves all collections with nested NFTs."
+          }
+        },
+        {
+          "name": "Get Collection By ID With NFTs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/collections/{{collectionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["collections", "{{collectionId}}"]
+            },
+            "description": "Retrieves a single collection by its ID including its associated NFTs."
+          }
+        }
+      ]
+    },
+    {
+      "name": "NFTs",
+      "item": [
+        {
+          "name": "Get All NFTs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/nfts",
+              "host": ["{{baseUrl}}"],
+              "path": ["nfts"]
+            },
+            "description": "Retrieves all NFTs across collections."
+          }
+        },
+        {
+          "name": "Get NFTs Filtered by Collection & Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/nfts?collectionId={{collectionId}}&status=active",
+              "host": ["{{baseUrl}}"],
+              "path": ["nfts"],
+              "query": [
+                {
+                  "key": "collectionId",
+                  "value": "{{collectionId}}"
+                },
+                {
+                  "key": "status",
+                  "value": "active"
+                }
+              ]
+            },
+            "description": "Retrieves NFTs filtered by query parameters."
+          }
+        },
+        {
+          "name": "Get NFT By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/nfts/{{nftId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["nfts", "{{nftId}}"]
+            },
+            "description": "Retrieves a single NFT by its 24-character ObjectId."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Offers & Escrow",
+      "item": [
+        {
+          "name": "1. Place Single-Item Offer",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.offerId) {",
+                  "    pm.collectionVariables.set('offerId', json.data.offerId);",
+                  "    console.log('Saved offerId:', json.data.offerId);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"buyerId\": \"{{buyerId}}\",\n  \"nftId\": \"{{nftId}}\",\n  \"grossAmountGrams\": 50000,\n  \"expiresAt\": \"2026-12-31T23:59:59.000Z\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/offers",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers"]
+            },
+            "description": "Atomically locks funds in escrow, creates debit ledger entry, and creates pending offer record."
+          }
+        },
+        {
+          "name": "2. Get All Offers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offers",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers"]
+            },
+            "description": "Retrieves all placed offers across the marketplace."
+          }
+        },
+        {
+          "name": "3. Get Offers Filtered by Status",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offers?status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending"
+                }
+              ]
+            },
+            "description": "Retrieves pending offers."
+          }
+        },
+        {
+          "name": "4. Get Offer By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offers/{{offerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers", "{{offerId}}"]
+            },
+            "description": "Retrieves details of a specific offer."
+          }
+        },
+        {
+          "name": "5. Accept & Settle Offer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sellerId\": \"{{sellerId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/offers/{{offerId}}/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers", "{{offerId}}", "accept"]
+            },
+            "description": "Seller accepts offer: transfers NFT, disburses payout and royalties, settles escrow, and cascades refunds to all competing bids."
+          }
+        }
+      ]
+    }
+  ]
+}
