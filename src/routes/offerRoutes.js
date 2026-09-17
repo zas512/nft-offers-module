@@ -6,6 +6,35 @@ const router = Router();
 /**
  * @openapi
  * /api/offers:
+ *   get:
+ *     summary: Get all offers
+ *     tags:
+ *       - Offers
+ *     parameters:
+ *       - in: query
+ *         name: buyerId
+ *         schema:
+ *           type: string
+ *         description: Filter by Buyer ObjectId
+ *       - in: query
+ *         name: collectionId
+ *         schema:
+ *           type: string
+ *         description: Filter by Collection ObjectId
+ *       - in: query
+ *         name: nftId
+ *         schema:
+ *           type: string
+ *         description: Filter by NFT ObjectId
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum: [pending, accepted, cancelled, expired, invalidated]
+ *         description: Filter by Offer status
+ *     responses:
+ *       200:
+ *         description: List of offers
  *   post:
  *     summary: Place a new single-item NFT offer
  *     description: Atomically locks funds in escrow, records audit ledger debit, and creates offer record in a single transaction.
@@ -48,42 +77,7 @@ const router = Router();
  *       404:
  *         description: NFT or Collection not found
  */
-router.post("/", createOffer);
-
-/**
- * @openapi
- * /api/offers:
- *   get:
- *     summary: Get all offers
- *     tags:
- *       - Offers
- *     parameters:
- *       - in: query
- *         name: buyerId
- *         schema:
- *           type: string
- *         description: Filter by Buyer ObjectId
- *       - in: query
- *         name: collectionId
- *         schema:
- *           type: string
- *         description: Filter by Collection ObjectId
- *       - in: query
- *         name: nftId
- *         schema:
- *           type: string
- *         description: Filter by NFT ObjectId
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum: [pending, accepted, cancelled, expired, invalidated]
- *         description: Filter by Offer status
- *     responses:
- *       200:
- *         description: List of offers
- */
-router.get("/", getOffers);
+router.route("/").get(getOffers).post(createOffer);
 
 /**
  * @openapi

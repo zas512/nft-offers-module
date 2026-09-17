@@ -8,6 +8,23 @@ export async function getAllUsers() {
   return db.collection(COLLECTIONS.USERS).find({}).toArray();
 }
 
+export async function getAllUsersWithNfts() {
+  const db = getDb();
+  return db
+    .collection(COLLECTIONS.USERS)
+    .aggregate([
+      {
+        $lookup: {
+          from: COLLECTIONS.NFTS,
+          localField: "_id",
+          foreignField: "ownerId",
+          as: "nfts"
+        }
+      }
+    ])
+    .toArray();
+}
+
 export async function getUserById(id) {
   if (!id || !ObjectId.isValid(id)) {
     throw createAppError("Invalid user ID format", 400);

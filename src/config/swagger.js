@@ -3,13 +3,15 @@ import swaggerUi from "swagger-ui-express";
 
 const swaggerOptions = {
   definition: {
+    openapi: "3.0.0",
     info: {
-      title: "NFT Offers API"
+      title: "NFT Offers API Marketplace",
+      version: "1.0.0"
     },
     servers: [
       {
         url: "http://localhost:5000",
-        description: ""
+        description: "Local development server"
       }
     ]
   },

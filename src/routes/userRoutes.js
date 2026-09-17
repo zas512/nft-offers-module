@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getUser, getUsers } from "../controllers/userController.js";
+import { getUser, getUsers, getUsersWithNfts } from "../controllers/userController.js";
 
 const router = Router();
 
@@ -15,6 +15,19 @@ const router = Router();
  *         description: List of all users
  */
 router.get("/", getUsers);
+
+/**
+ * @openapi
+ * /api/users/with-nfts:
+ *   get:
+ *     summary: Get all users with their owned NFTs
+ *     tags:
+ *       - Users
+ *     responses:
+ *       200:
+ *         description: List of users with nested NFTs array
+ */
+router.get("/with-nfts", getUsersWithNfts);
 
 /**
  * @openapi
