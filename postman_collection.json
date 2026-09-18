@@ -1,0 +1,452 @@
+{
+  "info": {
+    "_postman_id": "8f3b21c4-7b98-4c92-a162-8f19da563d41",
+    "name": "NFT Offers Module API",
+    "description": "Comprehensive Postman collection for the NFT Offers Module API, covering Users, Collections, NFTs, Offers, Escrows, and Ledger.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "buyerId",
+      "value": "65f1a1a1a1a1a1a1a1a1a101",
+      "type": "string"
+    },
+    {
+      "key": "sellerId",
+      "value": "65f1a1a1a1a1a1a1a1a1a102",
+      "type": "string"
+    },
+    {
+      "key": "nftId",
+      "value": "65f1a1a1a1a1a1a1a1a1a301",
+      "type": "string"
+    },
+    {
+      "key": "collectionId",
+      "value": "65f1a1a1a1a1a1a1a1a1a201",
+      "type": "string"
+    },
+    {
+      "key": "offerId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "escrowId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ledgerId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Offers",
+      "item": [
+        {
+          "name": "Create Single Item Offer",
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  "// Set expiresAt dynamically to 24 hours from now in ISO format",
+                  "const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();",
+                  "pm.variables.set('dynamicExpiresAt', expiresAt);"
+                ],
+                "type": "text/javascript"
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && json.data.offerId) {",
+                  "        pm.collectionVariables.set('offerId', json.data.offerId);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"buyerId\": \"{{buyerId}}\",\n  \"nftId\": \"{{nftId}}\",\n  \"grossAmountGrams\": 50000,\n  \"expiresAt\": \"{{dynamicExpiresAt}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/offers",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers"]
+            },
+            "description": "Creates a new single-item offer, placing the buyer's funds in escrow and recording initial ledger entries."
+          }
+        },
+        {
+          "name": "Get All Offers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offers?status=pending",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "description": "Optional: Filter by offer status (pending, accepted, rejected, cancelled, expired, invalidated)"
+                },
+                {
+                  "key": "buyerId",
+                  "value": "{{buyerId}}",
+                  "disabled": true,
+                  "description": "Optional: Filter by buyer ObjectId"
+                },
+                {
+                  "key": "collectionId",
+                  "value": "{{collectionId}}",
+                  "disabled": true,
+                  "description": "Optional: Filter by collection ObjectId"
+                },
+                {
+                  "key": "nftId",
+                  "value": "{{nftId}}",
+                  "disabled": true,
+                  "description": "Optional: Filter by NFT ObjectId"
+                }
+              ]
+            },
+            "description": "Fetches all offers with optional query filters (buyerId, collectionId, nftId, status)."
+          }
+        },
+        {
+          "name": "Get Offer by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offers/{{offerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers", "{{offerId}}"]
+            },
+            "description": "Fetches a single offer by its ObjectId."
+          }
+        },
+        {
+          "name": "Accept Single Item Offer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sellerId\": \"{{sellerId}}\",\n  \"nftId\": \"{{nftId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/offers/{{offerId}}/accept",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers", "{{offerId}}", "accept"]
+            },
+            "description": "Accepts an offer, transfers NFT ownership to the buyer, settles escrow, calculates fees (platform & royalty), and credits net payout to the seller."
+          }
+        },
+        {
+          "name": "Reject Single Item Offer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sellerId\": \"{{sellerId}}\",\n  \"nftId\": \"{{nftId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/offers/{{offerId}}/reject",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers", "{{offerId}}", "reject"]
+            },
+            "description": "Rejects an offer, refunds the locked escrow balance back to the buyer, and logs refund ledger entries."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["users"]
+            },
+            "description": "Lists all registered users and balances."
+          }
+        },
+        {
+          "name": "Get Users With NFTs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/with-nfts",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "with-nfts"]
+            },
+            "description": "Lists all users populated with their owned NFTs."
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{buyerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{buyerId}}"]
+            },
+            "description": "Fetches a specific user profile and balance."
+          }
+        },
+        {
+          "name": "Get User with NFTs by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{sellerId}}/with-nfts",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{sellerId}}", "with-nfts"]
+            },
+            "description": "Fetches a specific user along with their owned NFTs."
+          }
+        }
+      ]
+    },
+    {
+      "name": "NFTs",
+      "item": [
+        {
+          "name": "Get All NFTs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/nfts",
+              "host": ["{{baseUrl}}"],
+              "path": ["nfts"]
+            },
+            "description": "Lists all NFTs across collections."
+          }
+        },
+        {
+          "name": "Get NFT by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/nfts/{{nftId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["nfts", "{{nftId}}"]
+            },
+            "description": "Retrieves details of a specific NFT by ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Collections",
+      "item": [
+        {
+          "name": "Get All Collections",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/collections",
+              "host": ["{{baseUrl}}"],
+              "path": ["collections"]
+            },
+            "description": "Lists all NFT collections."
+          }
+        },
+        {
+          "name": "Get Collections With NFTs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/collections/with-nfts",
+              "host": ["{{baseUrl}}"],
+              "path": ["collections", "with-nfts"]
+            },
+            "description": "Lists all collections with their respective NFTs."
+          }
+        },
+        {
+          "name": "Get Collection by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/collections/{{collectionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["collections", "{{collectionId}}"]
+            },
+            "description": "Fetches a specific collection by ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Escrows",
+      "item": [
+        {
+          "name": "Get All Escrows",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/escrows?status=held",
+              "host": ["{{baseUrl}}"],
+              "path": ["escrows"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "held",
+                  "description": "Optional: Filter by escrow status (held, settled, refunded, cancelled)"
+                },
+                {
+                  "key": "offerId",
+                  "value": "{{offerId}}",
+                  "disabled": true,
+                  "description": "Optional: Filter by offer ObjectId"
+                },
+                {
+                  "key": "buyerId",
+                  "value": "{{buyerId}}",
+                  "disabled": true,
+                  "description": "Optional: Filter by buyer ObjectId"
+                },
+                {
+                  "key": "sellerId",
+                  "value": "{{sellerId}}",
+                  "disabled": true,
+                  "description": "Optional: Filter by seller ObjectId"
+                }
+              ]
+            },
+            "description": "Lists escrow accounts with optional filters (offerId, buyerId, sellerId, status)."
+          }
+        },
+        {
+          "name": "Get Escrow by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/escrows/{{escrowId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["escrows", "{{escrowId}}"]
+            },
+            "description": "Fetches an escrow record by its ID."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ledger",
+      "item": [
+        {
+          "name": "Get All Ledger Entries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ledger",
+              "host": ["{{baseUrl}}"],
+              "path": ["ledger"],
+              "query": [
+                {
+                  "key": "referenceId",
+                  "value": "{{offerId}}",
+                  "disabled": true,
+                  "description": "Optional: Filter by reference ObjectId (e.g. offerId)"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{buyerId}}",
+                  "disabled": true,
+                  "description": "Optional: Filter by user ObjectId"
+                },
+                {
+                  "key": "account",
+                  "value": "available",
+                  "disabled": true,
+                  "description": "Optional: available | treasury"
+                },
+                {
+                  "key": "type",
+                  "value": "escrow_lock",
+                  "disabled": true,
+                  "description": "Optional: escrow_lock | seller_payout | platform_fee | royalty_fee | escrow_refund"
+                },
+                {
+                  "key": "direction",
+                  "value": "debit",
+                  "disabled": true,
+                  "description": "Optional: credit | debit"
+                }
+              ]
+            },
+            "description": "Lists double-entry audit ledger transactions."
+          }
+        },
+        {
+          "name": "Get Ledger Entry by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/ledger/{{ledgerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["ledger", "{{ledgerId}}"]
+            },
+            "description": "Fetches a single ledger entry by its ID."
+          }
+        }
+      ]
+    }
+  ]
+}

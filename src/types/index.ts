@@ -22,7 +22,6 @@ export const NFT_STATUSES = ["active", "listed", "burned", "transferred"] as con
 export type NftStatus = (typeof NFT_STATUSES)[number];
 
 export const BPS_DENOMINATOR = 10000n;
-export const BPS_BASE = 10000;
 
 export const LEDGER_ACCOUNTS = ["available", "treasury"] as const;
 export type LedgerAccount = (typeof LEDGER_ACCOUNTS)[number];
