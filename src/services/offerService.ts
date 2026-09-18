@@ -3,6 +3,7 @@ import { EscrowAccount, LedgerEntry, Nft, Offer, User } from "../models/index.js
 import type {
   AcceptSingleItemOfferInput,
   CreateSingleItemOfferInput,
+  INft,
   IOffer,
   LedgerAccount,
   LedgerDirection,
@@ -11,7 +12,8 @@ import type {
   OfferRejectionSummary,
   OfferSettlementSummary,
   RejectSingleItemOfferInput,
-  SingleItemOfferResult
+  SingleItemOfferResult,
+  UserOffersResult
 } from "../types/index.js";
 import { BPS_DENOMINATOR } from "../types/index.js";
 import { AppError } from "../utils/appError.js";
@@ -537,6 +539,54 @@ export class OfferService {
       throw AppError.notFound("Offer not found");
     }
     return offer;
+  }
+
+  // Get offers for a specific user (made by user & received on owned NFTs)
+  public async getOffersByUserId(userId: string | Types.ObjectId): Promise<UserOffersResult> {
+    if (!userId || !mongoose.Types.ObjectId.isValid(userId.toString())) {
+      throw AppError.badRequest("Invalid user ID format");
+    }
+
+    const userObjectId = new mongoose.Types.ObjectId(userId.toString());
+    const user = await User.findById(userObjectId).lean();
+    if (!user) {
+      throw AppError.notFound("User not found");
+    }
+
+    await this.expirePendingOffers();
+
+    const [made, ownedNfts] = await Promise.all([
+      Offer.find({ buyerId: userObjectId }).lean<IOffer[]>(),
+      Nft.find({ ownerId: userObjectId }).select("_id").lean<INft[]>()
+    ]);
+
+    const ownedNftIds = ownedNfts.map((nft) => nft._id);
+    const received =
+      ownedNftIds.length > 0 ?
+        await Offer.find({ nftId: { $in: ownedNftIds } }).lean<IOffer[]>()
+      : [];
+
+    return {
+      made,
+      received
+    };
+  }
+
+  // Get all offers for a specific NFT
+  public async getOffersByNftId(nftId: string | Types.ObjectId): Promise<IOffer[]> {
+    if (!nftId || !mongoose.Types.ObjectId.isValid(nftId.toString())) {
+      throw AppError.badRequest("Invalid NFT ID format");
+    }
+
+    const nftObjectId = new mongoose.Types.ObjectId(nftId.toString());
+    const nft = await Nft.findById(nftObjectId).lean();
+    if (!nft) {
+      throw AppError.notFound("NFT not found");
+    }
+
+    await this.expirePendingOffers();
+
+    return Offer.find({ nftId: nftObjectId }).lean<IOffer[]>();
   }
 }
 

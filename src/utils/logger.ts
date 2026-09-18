@@ -69,15 +69,6 @@ export class Logger {
     const metaStr = meta ? ` ${Logger.formatDataPreview(meta)}` : "";
     console.log(`${Logger.formatTime()} ${colors.cyan}[INFO]${colors.reset} ${message}${metaStr}`);
   }
-  public flow(step: string, description: string, data: unknown = null): void {
-    const tag = `${colors.magenta}[FLOW ➔ ${step}]${colors.reset}`;
-    const desc = `${colors.white}${description}${colors.reset}`;
-    const preview =
-      data ?
-        `\n       ${colors.gray}└─ Data:${colors.reset} ${Logger.formatDataPreview(data)}`
-      : "";
-    console.log(`${Logger.formatTime()} ${tag} ${desc}${preview}`);
-  }
   public http(
     method: string,
     path: string,

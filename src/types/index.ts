@@ -180,3 +180,8 @@ export interface OfferRejectionSummary {
   refundedAmountGrams: string;
   status: "rejected";
 }
+
+export interface UserOffersResult {
+  made: IOffer[];
+  received: IOffer[];
+}

@@ -152,6 +152,32 @@
           }
         },
         {
+          "name": "Get Offers by User ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offers/user/{{buyerId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers", "user", "{{buyerId}}"]
+            },
+            "description": "Fetches all offers related to a user (both offers made by the user as buyer and offers received on NFTs owned by the user)."
+          }
+        },
+        {
+          "name": "Get Offers by NFT ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/offers/nft/{{nftId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["offers", "nft", "{{nftId}}"]
+            },
+            "description": "Fetches all offers placed on a specific NFT."
+          }
+        },
+        {
           "name": "Accept Single Item Offer",
           "request": {
             "method": "POST",
@@ -251,6 +277,19 @@
             },
             "description": "Fetches a specific user along with their owned NFTs."
           }
+        },
+        {
+          "name": "Get User Offers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/{{buyerId}}/offers",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "{{buyerId}}", "offers"]
+            },
+            "description": "Fetches all offers made and received for the specified user."
+          }
         }
       ]
     },
@@ -281,6 +320,19 @@
               "path": ["nfts", "{{nftId}}"]
             },
             "description": "Retrieves details of a specific NFT by ID."
+          }
+        },
+        {
+          "name": "Get NFT Offers",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/nfts/{{nftId}}/offers",
+              "host": ["{{baseUrl}}"],
+              "path": ["nfts", "{{nftId}}", "offers"]
+            },
+            "description": "Fetches all offers placed on this specific NFT."
           }
         }
       ]

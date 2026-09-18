@@ -48,6 +48,25 @@ export class OfferController {
     const offer = await offerService.getOfferById(String(req.params.id));
     res.status(200).json({ success: true, data: offer });
   });
+
+  public getOffersByUserId = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const userId = String(req.params.id || req.params.userId);
+    const offers = await offerService.getOffersByUserId(userId);
+    res.status(200).json({
+      success: true,
+      data: offers
+    });
+  });
+
+  public getOffersByNftId = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const nftId = String(req.params.id || req.params.nftId);
+    const offers = await offerService.getOffersByNftId(nftId);
+    res.status(200).json({
+      success: true,
+      count: offers.length,
+      data: offers
+    });
+  });
 }
 
 export const offerController = new OfferController();
@@ -56,3 +75,5 @@ export const acceptOffer = offerController.acceptOffer;
 export const rejectOffer = offerController.rejectOffer;
 export const getOffers = offerController.getOffers;
 export const getOffer = offerController.getOffer;
+export const getOffersByUserId = offerController.getOffersByUserId;
+export const getOffersByNftId = offerController.getOffersByNftId;

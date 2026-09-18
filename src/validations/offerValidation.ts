@@ -31,12 +31,7 @@ export const createOfferSchema = z.object({
     )
 });
 
-export const acceptOfferBodySchema = z.object({
-  sellerId: objectIdSchema,
-  nftId: objectIdSchema.optional()
-});
-
-export const rejectOfferBodySchema = z.object({
+export const offerActionBodySchema = z.object({
   sellerId: objectIdSchema,
   nftId: objectIdSchema.optional()
 });
