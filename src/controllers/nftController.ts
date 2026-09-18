@@ -10,7 +10,6 @@ export class NftController {
     const nfts = await nftService.getAllNfts(req.query as NftFilterQuery);
     res.status(200).json({ success: true, count: nfts.length, data: nfts });
   });
-
   public getNftByIdHandler = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const id = String(req.params.id);
     logger.flow("FETCH_NFT_BY_ID", `Retrieving NFT by ID: ${id}`);
@@ -20,6 +19,5 @@ export class NftController {
 }
 
 export const nftController = new NftController();
-
 export const getNfts = nftController.getNfts;
 export const getNftByIdHandler = nftController.getNftByIdHandler;

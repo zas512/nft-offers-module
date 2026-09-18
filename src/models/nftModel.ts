@@ -1,82 +1,85 @@
-import { Int32, ObjectId } from "mongodb";
-import { type CreateNftInput, type INft, NFT_STATUSES } from "../types/index.js";
+import mongoose, { Schema, type Model } from "mongoose";
+import { NFT_STATUSES, type CreateNftInput, type INft } from "../types/index.js";
 import { AppError } from "../utils/appError.js";
-import { createTimestamps } from "../utils/timestamps.js";
 import { createNftBodySchema } from "../validations/nftValidation.js";
 
 export { NFT_STATUSES };
 
-export const nftSchemaValidator = {
-  $jsonSchema: {
-    bsonType: "object",
-    required: [
-      "collectionId",
-      "ownerId",
-      "tokenId",
-      "name",
-      "status",
-      "isLocked",
-      "createdAt",
-      "updatedAt"
-    ],
-    properties: {
-      collectionId: {
-        bsonType: "objectId"
-      },
-      ownerId: {
-        bsonType: "objectId"
-      },
-      tokenId: {
-        bsonType: "int",
-        minimum: 1
-      },
-      name: {
-        bsonType: "string",
-        minLength: 1,
-        maxLength: 100
-      },
-      status: {
-        bsonType: "string",
-        enum: ["active", "listed", "burned", "transferred"]
-      },
-      isLocked: {
-        bsonType: "bool"
-      },
-      createdAt: { bsonType: "date" },
-      updatedAt: { bsonType: "date" }
+export const nftSchema = new Schema<INft>(
+  {
+    collectionId: {
+      type: Schema.Types.ObjectId,
+      ref: "Collection",
+      required: true
+    },
+    ownerId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true
+    },
+    tokenId: {
+      type: Number,
+      required: true,
+      min: 1
+    },
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 1,
+      maxlength: 100
+    },
+    status: {
+      type: String,
+      enum: NFT_STATUSES,
+      default: "active",
+      required: true
+    },
+    isLocked: {
+      type: Boolean,
+      default: false,
+      required: true
     }
+  },
+  {
+    timestamps: true,
+    versionKey: false
   }
-};
+);
 
-export class NftModel {
-  public static createDocument(input: CreateNftInput): Omit<INft, "_id"> {
-    const collectionIdStr = typeof input.collectionId === "string" ? input.collectionId : input.collectionId?.toString();
-    const ownerIdStr = typeof input.ownerId === "string" ? input.ownerId : input.ownerId?.toString();
+nftSchema.index({ collectionId: 1, tokenId: 1 }, { unique: true });
+nftSchema.index({ ownerId: 1 });
 
-    const parseResult = createNftBodySchema.safeParse({
-      ...input,
-      collectionId: collectionIdStr,
-      ownerId: ownerIdStr
-    });
+export const Nft: Model<INft> =
+  mongoose.models.Nft || mongoose.model<INft>("Nft", nftSchema, "nfts");
+export const NftModel = Nft;
 
-    if (!parseResult.success) {
-      throw AppError.badRequest(`INVALID_NFT_DATA: ${parseResult.error.issues[0]?.message}`);
-    }
-
-    const { collectionId, ownerId, tokenId, name, status, isLocked } = parseResult.data;
-
-    return {
-      collectionId: new ObjectId(collectionId),
-      ownerId: new ObjectId(ownerId),
-      tokenId: new Int32(tokenId),
-      name,
-      status,
-      isLocked,
-      ...createTimestamps()
-    };
+export function createNftDocument(input: CreateNftInput): Partial<INft> {
+  const collectionIdStr =
+    typeof input.collectionId === "string" ? input.collectionId : input.collectionId?.toString();
+  const ownerIdStr = typeof input.ownerId === "string" ? input.ownerId : input.ownerId?.toString();
+  const parseResult = createNftBodySchema.safeParse({
+    ...input,
+    collectionId: collectionIdStr,
+    ownerId: ownerIdStr
+  });
+  if (!parseResult.success) {
+    throw AppError.badRequest(`INVALID_NFT_DATA: ${parseResult.error.issues[0]?.message}`);
   }
-}
-
-export function createNftDocument(input: CreateNftInput): Omit<INft, "_id"> {
-  return NftModel.createDocument(input);
+  const {
+    collectionId,
+    ownerId,
+    tokenId,
+    name,
+    status = "active",
+    isLocked = false
+  } = parseResult.data;
+  return {
+    collectionId: new mongoose.Types.ObjectId(collectionId),
+    ownerId: new mongoose.Types.ObjectId(ownerId),
+    tokenId,
+    name,
+    status,
+    isLocked
+  };
 }

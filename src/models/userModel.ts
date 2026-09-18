@@ -1,54 +1,57 @@
-import { Long } from "mongodb";
+import mongoose, { Schema, type Model } from "mongoose";
 import type { CreateUserInput, IUser } from "../types/index.js";
 import { AppError } from "../utils/appError.js";
-import { createTimestamps } from "../utils/timestamps.js";
 import { createUserBodySchema } from "../validations/userValidation.js";
 
-export const userSchemaValidator = {
-  $jsonSchema: {
-    bsonType: "object",
-    required: ["name", "availableBalance", "createdAt", "updatedAt"],
-    properties: {
-      name: {
-        bsonType: "string",
-        minLength: 1,
-        maxLength: 60
-      },
-      walletAddress: {
-        bsonType: ["string", "null"]
-      },
-      telegramId: {
-        bsonType: ["string", "null"]
-      },
-      availableBalance: {
-        bsonType: "long",
-        minimum: 0
-      },
-      createdAt: { bsonType: "date" },
-      updatedAt: { bsonType: "date" }
+export const userSchema = new Schema<IUser>(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+      minlength: 1,
+      maxlength: 60
+    },
+    walletAddress: {
+      type: String,
+      default: null,
+      trim: true,
+      lowercase: true,
+      sparse: true
+    },
+    telegramId: {
+      type: String,
+      default: null,
+      trim: true,
+      sparse: true
+    },
+    availableBalance: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: [0, "availableBalance cannot be negative"]
     }
+  },
+  {
+    timestamps: true,
+    versionKey: false
   }
-};
+);
 
-export class UserModel {
-  public static createDocument(input: CreateUserInput): Omit<IUser, "_id"> {
-    const parseResult = createUserBodySchema.safeParse(input);
-    if (!parseResult.success) {
-      throw AppError.badRequest(`INVALID_USER_DATA: ${parseResult.error.issues[0]?.message}`);
-    }
+export const User: Model<IUser> =
+  mongoose.models.User || mongoose.model<IUser>("User", userSchema, "users");
+export const UserModel = User;
 
-    const { name, walletAddress, telegramId, initialBalanceGrams } = parseResult.data;
-
-    return {
-      name,
-      walletAddress: walletAddress ? walletAddress.toLowerCase().trim() : null,
-      telegramId: telegramId ? String(telegramId).trim() : null,
-      availableBalance: Long.fromNumber(initialBalanceGrams),
-      ...createTimestamps()
-    };
+export function createUserDocument(input: CreateUserInput): Partial<IUser> {
+  const parseResult = createUserBodySchema.safeParse(input);
+  if (!parseResult.success) {
+    throw AppError.badRequest(`INVALID_USER_DATA: ${parseResult.error.issues[0]?.message}`);
   }
-}
-
-export function createUserDocument(input: CreateUserInput): Omit<IUser, "_id"> {
-  return UserModel.createDocument(input);
+  const { name, walletAddress, telegramId, initialBalanceGrams } = parseResult.data;
+  return {
+    name,
+    walletAddress: walletAddress ? walletAddress.toLowerCase().trim() : null,
+    telegramId: telegramId ? String(telegramId).trim() : null,
+    availableBalance: initialBalanceGrams
+  };
 }

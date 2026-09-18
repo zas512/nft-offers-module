@@ -9,13 +9,13 @@ export class CollectionController {
     const collections = await collectionService.getAllCollections();
     res.status(200).json({ success: true, count: collections.length, data: collections });
   });
-
-  public getCollectionsWithNfts = asyncHandler(async (_req: Request, res: Response): Promise<void> => {
-    logger.flow("FETCH_COLLECTIONS_WITH_NFTS", "Retrieving all collections with nested NFTs");
-    const collections = await collectionService.getAllCollectionsWithNfts();
-    res.status(200).json({ success: true, count: collections.length, data: collections });
-  });
-
+  public getCollectionsWithNfts = asyncHandler(
+    async (_req: Request, res: Response): Promise<void> => {
+      logger.flow("FETCH_COLLECTIONS_WITH_NFTS", "Retrieving all collections with nested NFTs");
+      const collections = await collectionService.getAllCollectionsWithNfts();
+      res.status(200).json({ success: true, count: collections.length, data: collections });
+    }
+  );
   public getCollectionById = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const id = String(req.params.id);
     logger.flow("FETCH_COLLECTION_BY_ID", `Retrieving collection with NFTs for ID: ${id}`);
@@ -25,7 +25,6 @@ export class CollectionController {
 }
 
 export const collectionController = new CollectionController();
-
 export const getCollections = collectionController.getCollections;
 export const getCollectionsWithNfts = collectionController.getCollectionsWithNfts;
 export const getCollectionById = collectionController.getCollectionById;

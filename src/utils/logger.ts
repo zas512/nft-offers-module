@@ -26,7 +26,6 @@ export class Logger {
     const d = new Date();
     return `${colors.gray}${d.toISOString().slice(11, 23)}${colors.reset}`;
   }
-
   private static getMethodColor(method: string): string {
     switch (method.toUpperCase()) {
       case "GET":
@@ -42,7 +41,6 @@ export class Logger {
         return `${colors.magenta}${colors.bold}${method}${colors.reset}`;
     }
   }
-
   private static getStatusColor(status: number): string {
     if (status >= 200 && status < 300) {
       return `${colors.green}${colors.bold}${status}${colors.reset}`;
@@ -55,7 +53,6 @@ export class Logger {
     }
     return `${colors.red}${colors.bold}${status}${colors.reset}`;
   }
-
   private static formatDataPreview(data: unknown): string {
     if (!data || (typeof data === "object" && Object.keys(data as object).length === 0)) {
       return "";
@@ -68,21 +65,26 @@ export class Logger {
       return "";
     }
   }
-
   public info(message: string, meta: unknown = null): void {
     const metaStr = meta ? ` ${Logger.formatDataPreview(meta)}` : "";
     console.log(`${Logger.formatTime()} ${colors.cyan}[INFO]${colors.reset} ${message}${metaStr}`);
   }
-
   public flow(step: string, description: string, data: unknown = null): void {
     const tag = `${colors.magenta}[FLOW ➔ ${step}]${colors.reset}`;
     const desc = `${colors.white}${description}${colors.reset}`;
     const preview =
-      data ? `\n       ${colors.gray}└─ Data:${colors.reset} ${Logger.formatDataPreview(data)}` : "";
+      data ?
+        `\n       ${colors.gray}└─ Data:${colors.reset} ${Logger.formatDataPreview(data)}`
+      : "";
     console.log(`${Logger.formatTime()} ${tag} ${desc}${preview}`);
   }
-
-  public http(method: string, path: string, status: number, durationMs: number, details: unknown = null): void {
+  public http(
+    method: string,
+    path: string,
+    status: number,
+    durationMs: number,
+    details: unknown = null
+  ): void {
     const methodFormatted = Logger.getMethodColor(method);
     const statusFormatted = Logger.getStatusColor(status);
     const timing = `${colors.gray}+${durationMs}ms${colors.reset}`;
@@ -91,15 +93,17 @@ export class Logger {
       `${Logger.formatTime()} ${colors.blue}[HTTP]${colors.reset} ${methodFormatted} ${colors.bold}${path}${colors.reset} ${statusFormatted} ${timing}${extra}`
     );
   }
-
   public error(message: string, error?: unknown): void {
-    const errStr = error ? `\n${colors.red}${error instanceof Error ? error.stack : JSON.stringify(error)}${colors.reset}` : "";
+    let errStr = "";
+    if (error) {
+      const errorContent = error instanceof Error ? error.stack : JSON.stringify(error);
+      errStr = `\n${colors.red}${errorContent}${colors.reset}`;
+    }
     console.error(`${Logger.formatTime()} ${colors.red}[ERROR]${colors.reset} ${message}${errStr}`);
   }
 }
 
 export const logger = new Logger();
-
 export function requestFlowLogger(req: Request, res: Response, next: NextFunction): void {
   const startTime = Date.now();
   const method = req.method;
@@ -110,11 +114,9 @@ export function requestFlowLogger(req: Request, res: Response, next: NextFunctio
     ...(req.body && Object.keys(req.body).length ? { body: req.body } : {})
   };
   logger.info(`[API IN] ${method} ${url}`, Object.keys(incomingData).length ? incomingData : null);
-
   res.on("finish", () => {
     const duration = Date.now() - startTime;
     logger.http(method, url, res.statusCode, duration);
   });
-
   next();
 }

@@ -31,7 +31,6 @@ export class OfferController {
       data: offer
     });
   });
-
   public acceptOffer = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const id = String(req.params.id);
     const { sellerId } = req.body || {};
@@ -52,13 +51,11 @@ export class OfferController {
       data: settlement
     });
   });
-
   public getOffers = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     logger.flow("FETCH_OFFERS", "Retrieving offers", req.query);
     const offers = await offerService.getAllOffers(req.query as OfferFilterQuery);
     res.status(200).json({ success: true, count: offers.length, data: offers });
   });
-
   public getOffer = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const id = String(req.params.id);
     logger.flow("FETCH_OFFER_BY_ID", `Retrieving offer by ID: ${id}`);
@@ -68,7 +65,6 @@ export class OfferController {
 }
 
 export const offerController = new OfferController();
-
 export const createOffer = offerController.createOffer;
 export const acceptOffer = offerController.acceptOffer;
 export const getOffers = offerController.getOffers;
