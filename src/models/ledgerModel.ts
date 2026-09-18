@@ -35,9 +35,8 @@ export const ledgerEntrySchema = new Schema<ILedgerEntry>(
       required: true
     },
     amountGrams: {
-      type: Number,
-      required: true,
-      min: 1
+      type: Schema.Types.Mixed,
+      required: true
     },
     createdAt: {
       type: Date,

@@ -26,9 +26,8 @@ export const escrowAccountSchema = new Schema<IEscrowAccount>(
       default: null
     },
     grossAmountGrams: {
-      type: Number,
-      required: true,
-      min: 1
+      type: Schema.Types.Mixed,
+      required: true
     },
     platformFeeBps: {
       type: Number,

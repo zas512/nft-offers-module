@@ -24,10 +24,9 @@ export const userSchema = new Schema<IUser>(
       sparse: true
     },
     availableBalance: {
-      type: Number,
+      type: Schema.Types.Mixed,
       required: true,
-      default: 0,
-      min: [0, "availableBalance cannot be negative"]
+      default: 0
     }
   },
   {

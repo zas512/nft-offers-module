@@ -1,9 +1,5 @@
 import mongoose, { Schema, type Model } from "mongoose";
-import {
-  OFFER_STATUSES,
-  OFFER_TYPES,
-  type IOffer
-} from "../types/index.js";
+import { OFFER_STATUSES, OFFER_TYPES, type IOffer } from "../types/index.js";
 
 export { OFFER_STATUSES, OFFER_TYPES };
 
@@ -36,9 +32,8 @@ export const offerSchema = new Schema<IOffer>(
       required: true
     },
     grossAmountGrams: {
-      type: Number,
-      required: true,
-      min: 1
+      type: Schema.Types.Mixed,
+      required: true
     },
     status: {
       type: String,

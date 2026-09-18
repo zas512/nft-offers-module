@@ -1,15 +1,12 @@
+import { Router } from "express";
 import { getCollectionById, getCollections, getCollectionsWithNfts } from "../controllers/index.js";
-import { createApiRouter } from "../utils/routeHelper.js";
-import { collectionParamSchema } from "../validations/index.js";
+import { validate } from "../middlewares/validateMiddleware.js";
+import { idParamSchema } from "../validations/commonValidation.js";
 
-const api = createApiRouter("/api/collections", "Collections");
+const router = Router();
 
-api.get("/", { summary: "Get all collections" }, getCollections);
-api.get("/with-nfts", { summary: "Get all collections with nested NFTs" }, getCollectionsWithNfts);
-api.get(
-  "/:id",
-  { summary: "Get collection by ID with NFTs", validate: { params: collectionParamSchema } },
-  getCollectionById
-);
+router.get("/", getCollections);
+router.get("/with-nfts", getCollectionsWithNfts);
+router.get("/:id", validate({ params: idParamSchema }), getCollectionById);
 
-export default api.router;
+export default router;

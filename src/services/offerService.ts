@@ -3,7 +3,6 @@ import { Collection, EscrowAccount, LedgerEntry, Nft, Offer, User } from "../mod
 import type {
   AcceptSingleItemOfferInput,
   CreateSingleItemOfferInput,
-  ILedgerEntry,
   IOffer,
   OfferFilterQuery,
   OfferSettlementSummary,
@@ -11,10 +10,7 @@ import type {
 } from "../types/index.js";
 import { AppError } from "../utils/appError.js";
 import { logger } from "../utils/logger.js";
-import {
-  acceptOfferBodySchema,
-  createSingleItemOfferBodySchema
-} from "../validations/index.js";
+import { acceptOfferBodySchema, createSingleItemOfferBodySchema } from "../validations/index.js";
 
 export class OfferService {
   public async createSingleItemOffer(
@@ -22,18 +18,14 @@ export class OfferService {
   ): Promise<SingleItemOfferResult> {
     const validated = createSingleItemOfferBodySchema.parse(input);
     const { buyerId, nftId, grossAmountGrams, expiresAt } = validated;
-
     const expirationDate = expiresAt instanceof Date ? expiresAt : new Date(expiresAt);
-
     const session = await mongoose.startSession();
-
     try {
       let result!: SingleItemOfferResult;
       await session.withTransaction(async () => {
         const now = new Date();
         const buyerObjectId = new mongoose.Types.ObjectId(buyerId);
         const nftObjectId = new mongoose.Types.ObjectId(nftId);
-
         const nft = await Nft.findById(nftObjectId).session(session);
         if (!nft) {
           throw AppError.notFound("NFT not found");
@@ -44,35 +36,30 @@ export class OfferService {
         if (nft.ownerId.equals(buyerObjectId)) {
           throw AppError.badRequest("Cannot place an offer on your own NFT");
         }
-
         const collection = await Collection.findById(nft.collectionId).session(session);
         if (!collection) {
           throw AppError.notFound("Parent collection for NFT not found");
         }
-
+        const grossAmountLong = mongoose.mongo.Long.fromString(String(grossAmountGrams));
         const balanceUpdate = await User.updateOne(
           {
             _id: buyerObjectId,
-            availableBalance: { $gte: grossAmountGrams }
+            availableBalance: { $gte: grossAmountLong }
           },
           {
-            $inc: { availableBalance: -grossAmountGrams }
+            $inc: { availableBalance: mongoose.mongo.Long.fromString(String(-grossAmountGrams)) }
           },
           { session }
         );
-
         if (balanceUpdate.matchedCount === 0) {
           throw AppError.badRequest(
             "Insufficient funds: Available balance is lower than offer amount"
           );
         }
-
         const offerId = new mongoose.Types.ObjectId();
         const escrowId = new mongoose.Types.ObjectId();
-
         const platformFeeBps = Number(collection.platformFeeBps) || 0;
         const royaltyFeeBps = Number(collection.royaltyFeeBps) || 0;
-
         await EscrowAccount.create(
           [
             {
@@ -81,7 +68,7 @@ export class OfferService {
               buyerId: buyerObjectId,
               sellerId: nft.ownerId,
               creatorId: collection.creatorId || null,
-              grossAmountGrams,
+              grossAmountGrams: grossAmountLong,
               platformFeeBps,
               royaltyFeeBps,
               status: "held",
@@ -90,7 +77,6 @@ export class OfferService {
           ],
           { session }
         );
-
         await LedgerEntry.create(
           [
             {
@@ -100,13 +86,12 @@ export class OfferService {
               account: "available",
               type: "escrow_lock",
               direction: "debit",
-              amountGrams: grossAmountGrams,
+              amountGrams: grossAmountLong,
               createdAt: now
             }
           ],
           { session }
         );
-
         await Offer.create(
           [
             {
@@ -116,20 +101,18 @@ export class OfferService {
               collectionId: nft.collectionId,
               nftId: nftObjectId,
               type: "item",
-              grossAmountGrams,
+              grossAmountGrams: grossAmountLong,
               status: "pending",
               expiresAt: expirationDate
             }
           ],
           { session }
         );
-
         logger.flow("SINGLE_ITEM_OFFER_CREATED", "Offer placed, escrow held & ledger audited", {
           offerId: offerId.toString(),
           escrowId: escrowId.toString(),
           grossAmountGrams
         });
-
         result = {
           offerId: offerId.toString(),
           escrowId: escrowId.toString(),
@@ -142,7 +125,6 @@ export class OfferService {
           expiresAt: expirationDate.toISOString()
         };
       });
-
       return result;
     } finally {
       await session.endSession();
@@ -185,58 +167,46 @@ export class OfferService {
       throw AppError.badRequest("Invalid offer ID format");
     }
     acceptOfferBodySchema.parse({ sellerId });
-
     const session = await mongoose.startSession();
-
     try {
       let settlementSummary!: OfferSettlementSummary;
       await session.withTransaction(async () => {
         const now = new Date();
         const offerObjectId = new mongoose.Types.ObjectId(offerId);
         const sellerObjectId = new mongoose.Types.ObjectId(sellerId);
-
         const offer = await Offer.findOne({
           _id: offerObjectId,
           status: "pending",
           expiresAt: { $gt: now }
         }).session(session);
-
         if (!offer) {
           throw AppError.notFound("Offer not found or has already expired");
         }
-
         const escrow = await EscrowAccount.findOne({
           _id: offer.escrowId,
           status: "held"
         }).session(session);
-
         if (!escrow) {
           throw AppError.badRequest("Escrow not found or is in an invalid state");
         }
-
         if (!offer.nftId) {
           throw AppError.badRequest("Offer does not contain an associated NFT");
         }
-
         const nft = await Nft.findOne({
           _id: offer.nftId,
           ownerId: sellerObjectId,
           isLocked: false
         }).session(session);
-
         if (!nft) {
           throw AppError.forbidden("Seller not authorized to accept this offer or NFT is locked");
         }
-
-        const gross = BigInt(escrow.grossAmountGrams);
+        const gross = BigInt(escrow.grossAmountGrams.toString());
         const platformBps = BigInt(escrow.platformFeeBps ?? escrow.feeConfig?.platformFeeBps ?? 0);
         const royaltyBps = BigInt(escrow.royaltyFeeBps ?? escrow.feeConfig?.royaltyFeeBps ?? 0);
         const creatorId = escrow.creatorId ?? escrow.feeConfig?.creatorId ?? null;
-
         const platformFee = (gross * platformBps) / 10000n;
         const royaltyFee = (gross * royaltyBps) / 10000n;
         const netPayout = gross - platformFee - royaltyFee;
-
         await Nft.updateOne(
           { _id: nft._id },
           {
@@ -248,25 +218,22 @@ export class OfferService {
           },
           { session }
         );
-
         await User.updateOne(
           { _id: sellerObjectId },
           {
-            $inc: { availableBalance: Number(netPayout) }
+            $inc: { availableBalance: mongoose.mongo.Long.fromString(netPayout.toString()) }
           },
           { session }
         );
-
         if (royaltyFee > 0n && creatorId) {
           await User.updateOne(
             { _id: creatorId },
             {
-              $inc: { availableBalance: Number(royaltyFee) }
+              $inc: { availableBalance: mongoose.mongo.Long.fromString(royaltyFee.toString()) }
             },
             { session }
           );
         }
-
         await EscrowAccount.updateOne(
           { _id: escrow._id },
           {
@@ -278,7 +245,6 @@ export class OfferService {
           },
           { session }
         );
-
         await Offer.updateOne(
           { _id: offer._id },
           {
@@ -288,8 +254,7 @@ export class OfferService {
           },
           { session }
         );
-
-        const ledgerEntries: Partial<ILedgerEntry>[] = [
+        const ledgerEntries: any[] = [
           {
             _id: new mongoose.Types.ObjectId(),
             referenceId: escrow._id,
@@ -297,7 +262,7 @@ export class OfferService {
             account: "available",
             type: "seller_payout",
             direction: "credit",
-            amountGrams: Number(netPayout),
+            amountGrams: mongoose.mongo.Long.fromString(netPayout.toString()),
             createdAt: now
           },
           {
@@ -307,11 +272,10 @@ export class OfferService {
             account: "treasury",
             type: "platform_fee",
             direction: "credit",
-            amountGrams: Number(platformFee),
+            amountGrams: mongoose.mongo.Long.fromString(platformFee.toString()),
             createdAt: now
           }
         ];
-
         if (royaltyFee > 0n && creatorId) {
           ledgerEntries.push({
             _id: new mongoose.Types.ObjectId(),
@@ -320,46 +284,40 @@ export class OfferService {
             account: "available",
             type: "royalty_fee",
             direction: "credit",
-            amountGrams: Number(royaltyFee),
+            amountGrams: mongoose.mongo.Long.fromString(royaltyFee.toString()),
             createdAt: now
           });
         }
-
         await LedgerEntry.insertMany(ledgerEntries, { session });
-
         const competingOffers = await Offer.find({
           _id: { $ne: offer._id },
           nftId: nft._id,
           status: "pending"
         }).session(session);
-
         for (const compOffer of competingOffers) {
           await Offer.updateOne(
             { _id: compOffer._id },
             { $set: { status: "invalidated" } },
             { session }
           );
-
           const compEscrow = await EscrowAccount.findOne({
             _id: compOffer.escrowId,
             status: "held"
           }).session(session);
-
           if (compEscrow) {
+            const compGrossLong = mongoose.mongo.Long.fromString(compEscrow.grossAmountGrams.toString());
             await EscrowAccount.updateOne(
               { _id: compEscrow._id },
               { $set: { status: "refunded", settledAt: now } },
               { session }
             );
-
             await User.updateOne(
               { _id: compOffer.buyerId },
               {
-                $inc: { availableBalance: compEscrow.grossAmountGrams }
+                $inc: { availableBalance: compGrossLong }
               },
               { session }
             );
-
             await LedgerEntry.create(
               [
                 {
@@ -369,7 +327,7 @@ export class OfferService {
                   account: "available",
                   type: "escrow_refund",
                   direction: "credit",
-                  amountGrams: compEscrow.grossAmountGrams,
+                  amountGrams: compGrossLong,
                   createdAt: now
                 }
               ],
@@ -377,7 +335,6 @@ export class OfferService {
             );
           }
         }
-
         logger.flow(
           "SINGLE_ITEM_OFFER_ACCEPTED",
           "Offer accepted & settled with cascade invalidation",
@@ -388,7 +345,6 @@ export class OfferService {
             invalidatedBidsCount: competingOffers.length
           }
         );
-
         settlementSummary = {
           offerId: offer._id.toString(),
           nftId: nft._id.toString(),
@@ -401,7 +357,6 @@ export class OfferService {
           invalidatedOffersCount: competingOffers.length
         };
       });
-
       return settlementSummary;
     } finally {
       await session.endSession();

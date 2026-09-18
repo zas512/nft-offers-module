@@ -29,6 +29,28 @@ export class UserService {
     }
     return user;
   }
+  public async getUserByIdWithNfts(id: string): Promise<Record<string, unknown>> {
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      throw AppError.badRequest("Invalid user ID format");
+    }
+    const results = await User.aggregate([
+      {
+        $match: { _id: new mongoose.Types.ObjectId(id) }
+      },
+      {
+        $lookup: {
+          from: "nfts",
+          localField: "_id",
+          foreignField: "ownerId",
+          as: "nfts"
+        }
+      }
+    ]);
+    if (!results.length) {
+      throw AppError.notFound("User not found");
+    }
+    return results[0] as Record<string, unknown>;
+  }
 }
 
 export const userService = new UserService();

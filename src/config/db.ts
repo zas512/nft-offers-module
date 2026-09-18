@@ -5,9 +5,7 @@ export class Database {
   private connection: Connection | null = null;
   private constructor() {}
   public static getInstance(): Database {
-    if (!Database.instance) {
-      Database.instance = new Database();
-    }
+    Database.instance ||= new Database();
     return Database.instance;
   }
   public async connect(): Promise<Connection> {
@@ -22,7 +20,7 @@ export class Database {
     try {
       await mongoose.connect(mongoUri);
       this.connection = mongoose.connection;
-      console.log("Connected to MongoDB via Mongoose");
+      console.log("Connected to MongoDB");
       return this.connection;
     } catch (err) {
       console.error("MongoDB connection failed:", err);

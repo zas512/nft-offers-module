@@ -1,3 +1,4 @@
+import type mongoose from "mongoose";
 import type { Types } from "mongoose";
 
 export const OFFER_TYPES = ["item", "collection"] as const;
@@ -31,7 +32,7 @@ export interface IUser extends ITimestamps {
   name: string;
   walletAddress: string | null;
   telegramId: string | null;
-  availableBalance: number;
+  availableBalance: number | mongoose.mongo.Long;
 }
 
 export interface ICollection extends ITimestamps {
@@ -59,7 +60,7 @@ export interface IOffer extends ITimestamps {
   collectionId: Types.ObjectId;
   nftId: Types.ObjectId | null;
   type: OfferType;
-  grossAmountGrams: number;
+  grossAmountGrams: number | mongoose.mongo.Long;
   status: OfferStatus;
   expiresAt: Date;
 }
@@ -70,7 +71,7 @@ export interface IEscrowAccount extends ITimestamps {
   buyerId: Types.ObjectId;
   sellerId: Types.ObjectId | null;
   creatorId: Types.ObjectId | null;
-  grossAmountGrams: number;
+  grossAmountGrams: number | mongoose.mongo.Long;
   platformFeeBps: number;
   royaltyFeeBps: number;
   status: EscrowStatus;
@@ -89,7 +90,7 @@ export interface ILedgerEntry {
   account: string;
   type: string;
   direction: LedgerDirection;
-  amountGrams: number;
+  amountGrams: number | mongoose.mongo.Long;
   createdAt: Date;
 }
 

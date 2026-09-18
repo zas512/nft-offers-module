@@ -20,9 +20,16 @@ export class UserController {
     const user = await userService.getUserById(id);
     res.status(200).json({ success: true, data: user });
   });
+  public getUserWithNfts = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const id = String(req.params.id);
+    logger.flow("FETCH_USER_WITH_NFTS", `Retrieving user with NFTs for ID: ${id}`);
+    const user = await userService.getUserByIdWithNfts(id);
+    res.status(200).json({ success: true, data: user });
+  });
 }
 
 export const userController = new UserController();
 export const getUsers = userController.getUsers;
 export const getUsersWithNfts = userController.getUsersWithNfts;
 export const getUser = userController.getUser;
+export const getUserWithNfts = userController.getUserWithNfts;
