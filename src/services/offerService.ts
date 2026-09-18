@@ -13,6 +13,7 @@ import type {
 } from "../types/index.js";
 import { BPS_DENOMINATOR } from "../types/index.js";
 import { AppError } from "../utils/appError.js";
+import { validateNftForOffer } from "../validations/index.js";
 
 const toLong = (n: bigint | number | string) => mongoose.mongo.Long.fromString(String(n));
 
@@ -91,16 +92,19 @@ export class OfferService {
       nftId instanceof mongoose.Types.ObjectId ? nftId : new mongoose.Types.ObjectId(nftId);
     return this.runInTransaction(async (session) => {
       const now = new Date();
+      const existingOffer = await Offer.findOne({
+        buyerId: buyerObjectId,
+        nftId: nftObjectId,
+        status: "pending",
+        expiresAt: { $gt: now }
+      }).session(session);
+      if (existingOffer) {
+        throw AppError.badRequest(
+          "An active offer for this NFT already exists from you. Please wait until it expires before making a new one."
+        );
+      }
       const nft = await Nft.findById(nftObjectId).session(session);
-      if (!nft) {
-        throw AppError.notFound("NFT not found");
-      }
-      if (nft.isLocked) {
-        throw AppError.badRequest("NFT is currently locked");
-      }
-      if (nft.ownerId.equals(buyerObjectId)) {
-        throw AppError.badRequest("Cannot place an offer on your own NFT");
-      }
+      validateNftForOffer(nft, buyerObjectId);
       const grossAmountLong = toLong(grossAmountGrams);
       const balanceUpdate = await User.updateOne(
         {

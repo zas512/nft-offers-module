@@ -126,6 +126,21 @@ export interface OfferFilterQuery {
   status?: OfferStatus;
 }
 
+export interface EscrowFilterQuery {
+  offerId?: string;
+  buyerId?: string;
+  sellerId?: string;
+  status?: EscrowStatus;
+}
+
+export interface LedgerFilterQuery {
+  referenceId?: string;
+  userId?: string;
+  account?: LedgerAccount;
+  type?: LedgerType;
+  direction?: LedgerDirection;
+}
+
 export interface SingleItemOfferResult {
   offerId: string;
   escrowId: string;

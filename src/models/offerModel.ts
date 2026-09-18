@@ -55,6 +55,13 @@ export const offerSchema = new Schema<IOffer>(
 offerSchema.index({ nftId: 1, status: 1 });
 offerSchema.index({ buyerId: 1 });
 offerSchema.index({ collectionId: 1 });
+offerSchema.index(
+  { buyerId: 1, nftId: 1 },
+  {
+    unique: true,
+    partialFilterExpression: { status: "pending", nftId: { $type: "objectId" } }
+  }
+);
 
 export const Offer: Model<IOffer> =
   mongoose.models.Offer || mongoose.model<IOffer>("Offer", offerSchema, "offers");
