@@ -16,12 +16,26 @@ export class OfferController {
   public acceptOffer = asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const settlement = await offerService.acceptSingleItemOffer({
       offerId: String(req.params.id),
-      sellerId: String(req.body.sellerId)
+      sellerId: String(req.body.sellerId),
+      nftId: req.body.nftId ? String(req.body.nftId) : undefined
     });
     res.status(200).json({
       success: true,
       message: "Offer accepted and settled successfully.",
       data: settlement
+    });
+  });
+
+  public rejectOffer = asyncHandler(async (req: Request, res: Response): Promise<void> => {
+    const rejection = await offerService.rejectSingleItemOffer({
+      offerId: String(req.params.id),
+      sellerId: String(req.body.sellerId),
+      nftId: req.body.nftId ? String(req.body.nftId) : undefined
+    });
+    res.status(200).json({
+      success: true,
+      message: "Offer rejected and escrow refunded successfully.",
+      data: rejection
     });
   });
 
@@ -39,5 +53,6 @@ export class OfferController {
 export const offerController = new OfferController();
 export const createOffer = offerController.createOffer;
 export const acceptOffer = offerController.acceptOffer;
+export const rejectOffer = offerController.rejectOffer;
 export const getOffers = offerController.getOffers;
 export const getOffer = offerController.getOffer;

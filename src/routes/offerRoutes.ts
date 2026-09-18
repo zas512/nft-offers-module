@@ -1,11 +1,18 @@
 import { Router } from "express";
-import { acceptOffer, createOffer, getOffer, getOffers } from "../controllers/index.js";
+import {
+  acceptOffer,
+  createOffer,
+  getOffer,
+  getOffers,
+  rejectOffer
+} from "../controllers/index.js";
 import { validate } from "../middlewares/validateMiddleware.js";
 import {
   acceptOfferBodySchema,
   createOfferSchema,
   idParamSchema,
-  offerFilterQuerySchema
+  offerFilterQuerySchema,
+  rejectOfferBodySchema
 } from "../validations/index.js";
 
 const router = Router();
@@ -18,6 +25,11 @@ router.post(
   "/:id/accept",
   validate({ params: idParamSchema, body: acceptOfferBodySchema }),
   acceptOffer
+);
+router.post(
+  "/:id/reject",
+  validate({ params: idParamSchema, body: rejectOfferBodySchema }),
+  rejectOffer
 );
 
 export default router;

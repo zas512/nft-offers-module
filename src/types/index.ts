@@ -7,6 +7,7 @@ export type OfferType = (typeof OFFER_TYPES)[number];
 export const OFFER_STATUSES = [
   "pending",
   "accepted",
+  "rejected",
   "cancelled",
   "expired",
   "invalidated"
@@ -111,6 +112,13 @@ export interface CreateSingleItemOfferInput {
 export interface AcceptSingleItemOfferInput {
   offerId: Types.ObjectId | string;
   sellerId: Types.ObjectId | string;
+  nftId?: Types.ObjectId | string;
+}
+
+export interface RejectSingleItemOfferInput {
+  offerId: Types.ObjectId | string;
+  sellerId: Types.ObjectId | string;
+  nftId?: Types.ObjectId | string;
 }
 
 export interface NftFilterQuery {
@@ -163,4 +171,13 @@ export interface OfferSettlementSummary {
   platformFeeGrams: string;
   royaltyFeeGrams: string;
   invalidatedOffersCount: number;
+}
+
+export interface OfferRejectionSummary {
+  offerId: string;
+  nftId: string;
+  buyerId: string;
+  sellerId: string;
+  refundedAmountGrams: string;
+  status: "rejected";
 }

@@ -8,14 +8,21 @@ import type {
   LedgerDirection,
   LedgerType,
   OfferFilterQuery,
+  OfferRejectionSummary,
   OfferSettlementSummary,
+  RejectSingleItemOfferInput,
   SingleItemOfferResult
 } from "../types/index.js";
 import { BPS_DENOMINATOR } from "../types/index.js";
 import { AppError } from "../utils/appError.js";
-import { validateNftForOffer } from "../validations/index.js";
+import {
+  validateNftForAcceptance,
+  validateNftForOffer,
+  validateNftForRejection
+} from "../validations/index.js";
 
-const toLong = (n: bigint | number | string) => mongoose.mongo.Long.fromString(String(n));
+const toLong = (n: bigint | number | string | mongoose.mongo.Long) =>
+  n instanceof mongoose.mongo.Long ? n : mongoose.mongo.Long.fromString(n.toString());
 
 interface SettlementCalculation {
   gross: bigint;
@@ -39,8 +46,8 @@ export class OfferService {
   }
 
   private buildLedgerEntry(p: {
-    referenceId: Types.ObjectId;
-    userId: Types.ObjectId | null;
+    referenceId: Types.ObjectId | string;
+    userId: Types.ObjectId | string | null;
     account: LedgerAccount;
     type: LedgerType;
     direction: LedgerDirection;
@@ -48,7 +55,6 @@ export class OfferService {
     now: Date;
   }) {
     return {
-      _id: new mongoose.Types.ObjectId(),
       referenceId: p.referenceId,
       userId: p.userId,
       account: p.account,
@@ -86,15 +92,11 @@ export class OfferService {
   ): Promise<SingleItemOfferResult> {
     const { buyerId, nftId, grossAmountGrams, expiresAt } = input;
     const expirationDate = expiresAt instanceof Date ? expiresAt : new Date(expiresAt);
-    const buyerObjectId =
-      buyerId instanceof mongoose.Types.ObjectId ? buyerId : new mongoose.Types.ObjectId(buyerId);
-    const nftObjectId =
-      nftId instanceof mongoose.Types.ObjectId ? nftId : new mongoose.Types.ObjectId(nftId);
     return this.runInTransaction(async (session) => {
       const now = new Date();
       const existingOffer = await Offer.findOne({
-        buyerId: buyerObjectId,
-        nftId: nftObjectId,
+        buyerId,
+        nftId,
         status: "pending",
         expiresAt: { $gt: now }
       }).session(session);
@@ -103,16 +105,16 @@ export class OfferService {
           "An active offer for this NFT already exists from you. Please wait until it expires before making a new one."
         );
       }
-      const nft = await Nft.findById(nftObjectId).session(session);
-      validateNftForOffer(nft, buyerObjectId);
+      const nft = await Nft.findById(nftId).session(session);
+      validateNftForOffer(nft, buyerId);
       const grossAmountLong = toLong(grossAmountGrams);
       const balanceUpdate = await User.updateOne(
         {
-          _id: buyerObjectId,
+          _id: buyerId,
           availableBalance: { $gte: grossAmountLong }
         },
         {
-          $inc: { availableBalance: toLong(`-${grossAmountGrams}`) }
+          $inc: { availableBalance: toLong(-BigInt(grossAmountGrams)) }
         },
         { session }
       );
@@ -123,14 +125,15 @@ export class OfferService {
       }
       const offerId = new mongoose.Types.ObjectId();
       const escrowId = new mongoose.Types.ObjectId();
-      const platformFeeBps = Math.round(2.5 * 100);
-      const royaltyFeeBps = Math.round(5 * 100);
+      const platformFeeBps = 250;
+      const royaltyFeeBps = 500;
+
       await EscrowAccount.create(
         [
           {
             _id: escrowId,
             offerId,
-            buyerId: buyerObjectId,
+            buyerId,
             sellerId: nft.ownerId,
             grossAmountGrams: grossAmountLong,
             platformFeeBps,
@@ -141,11 +144,29 @@ export class OfferService {
         ],
         { session }
       );
-      await LedgerEntry.create(
+
+      await Offer.create(
+        [
+          {
+            _id: offerId,
+            buyerId,
+            escrowId,
+            collectionId: nft.collectionId,
+            nftId,
+            type: "item",
+            grossAmountGrams: grossAmountLong,
+            status: "pending",
+            expiresAt: expirationDate
+          }
+        ],
+        { session }
+      );
+
+      await LedgerEntry.insertMany(
         [
           this.buildLedgerEntry({
             referenceId: escrowId,
-            userId: buyerObjectId,
+            userId: buyerId,
             account: "available",
             type: "escrow_lock",
             direction: "debit",
@@ -155,29 +176,14 @@ export class OfferService {
         ],
         { session }
       );
-      await Offer.create(
-        [
-          {
-            _id: offerId,
-            buyerId: buyerObjectId,
-            escrowId,
-            collectionId: nft.collectionId,
-            nftId: nftObjectId,
-            type: "item",
-            grossAmountGrams: grossAmountLong,
-            status: "pending",
-            expiresAt: expirationDate
-          }
-        ],
-        { session }
-      );
+
       return {
         offerId: offerId.toString(),
         escrowId: escrowId.toString(),
-        buyerId: buyerObjectId.toString(),
+        buyerId: buyerId.toString(),
         sellerId: nft.ownerId.toString(),
         collectionId: nft.collectionId.toString(),
-        nftId: nftObjectId.toString(),
+        nftId: nftId.toString(),
         grossAmountGrams: grossAmountGrams.toString(),
         status: "pending",
         expiresAt: expirationDate.toISOString()
@@ -189,24 +195,26 @@ export class OfferService {
   private async loadOfferForAcceptance(
     offerId: Types.ObjectId | string,
     sellerId: Types.ObjectId | string,
-    session: ClientSession
+    session: ClientSession,
+    inputNftId?: Types.ObjectId | string
   ) {
     const now = new Date();
-    const offerObjectId =
-      offerId instanceof mongoose.Types.ObjectId ? offerId : new mongoose.Types.ObjectId(offerId);
-    const sellerObjectId =
-      sellerId instanceof mongoose.Types.ObjectId ?
-        sellerId
-      : new mongoose.Types.ObjectId(sellerId);
-
     const offer = await Offer.findOne({
-      _id: offerObjectId,
+      _id: offerId,
       status: "pending",
       expiresAt: { $gt: now }
     }).session(session);
     if (!offer) {
       throw AppError.notFound("Offer not found or has already expired");
     }
+    if (!offer.nftId) {
+      throw AppError.badRequest("Offer does not contain an associated NFT");
+    }
+    if (inputNftId && !offer.nftId.equals(inputNftId)) {
+      throw AppError.badRequest("Offer does not match the provided NFT ID");
+    }
+    const nft = await Nft.findById(offer.nftId).session(session);
+    validateNftForAcceptance(nft, sellerId);
     const escrow = await EscrowAccount.findOne({
       _id: offer.escrowId,
       status: "held"
@@ -214,18 +222,7 @@ export class OfferService {
     if (!escrow) {
       throw AppError.badRequest("Escrow not found or is in an invalid state");
     }
-    if (!offer.nftId) {
-      throw AppError.badRequest("Offer does not contain an associated NFT");
-    }
-    const nft = await Nft.findOne({
-      _id: offer.nftId,
-      ownerId: sellerObjectId,
-      isLocked: false
-    }).session(session);
-    if (!nft) {
-      throw AppError.forbidden("Seller not authorized to accept this offer or NFT is locked");
-    }
-    return { offer, escrow, nft, sellerObjectId };
+    return { offer, escrow, nft };
   }
 
   // Invalidate competing offers
@@ -265,7 +262,7 @@ export class OfferService {
         updateOne: {
           filter: { _id: escrow.buyerId },
           update: {
-            $inc: { availableBalance: toLong(escrow.grossAmountGrams.toString()) }
+            $inc: { availableBalance: toLong(escrow.grossAmountGrams) }
           }
         }
       }));
@@ -277,7 +274,7 @@ export class OfferService {
           account: "available",
           type: "escrow_refund",
           direction: "credit",
-          amountGrams: toLong(escrow.grossAmountGrams.toString()),
+          amountGrams: toLong(escrow.grossAmountGrams),
           now
         })
       );
@@ -290,13 +287,14 @@ export class OfferService {
   public async acceptSingleItemOffer(
     input: AcceptSingleItemOfferInput
   ): Promise<OfferSettlementSummary> {
-    const { offerId, sellerId } = input;
+    const { offerId, sellerId, nftId } = input;
     return this.runInTransaction(async (session) => {
       const now = new Date();
-      const { offer, escrow, nft, sellerObjectId } = await this.loadOfferForAcceptance(
+      const { offer, escrow, nft } = await this.loadOfferForAcceptance(
         offerId,
         sellerId,
-        session
+        session,
+        nftId
       );
       const { gross, platformFee, royaltyFee, netPayout } = this.calculateSettlement(
         escrow.grossAmountGrams.toString(),
@@ -315,7 +313,7 @@ export class OfferService {
         { session }
       );
       await User.updateOne(
-        { _id: sellerObjectId },
+        { _id: sellerId },
         {
           $inc: { availableBalance: toLong(netPayout) }
         },
@@ -325,7 +323,7 @@ export class OfferService {
         { _id: escrow._id },
         {
           $set: {
-            sellerId: sellerObjectId,
+            sellerId,
             status: "settled",
             settledAt: now
           }
@@ -344,7 +342,7 @@ export class OfferService {
       const settlementLedgerEntries = [
         this.buildLedgerEntry({
           referenceId: escrow._id,
-          userId: sellerObjectId,
+          userId: sellerId,
           account: "available",
           type: "seller_payout",
           direction: "credit",
@@ -361,6 +359,19 @@ export class OfferService {
           now
         })
       ];
+      if (royaltyFee > 0n) {
+        settlementLedgerEntries.push(
+          this.buildLedgerEntry({
+            referenceId: escrow._id,
+            userId: null,
+            account: "treasury",
+            type: "royalty_fee",
+            direction: "credit",
+            amountGrams: toLong(royaltyFee),
+            now
+          })
+        );
+      }
       await LedgerEntry.insertMany(settlementLedgerEntries, { session });
       const invalidatedOffersCount = await this.invalidateCompetingOffers(
         nft._id,
@@ -372,7 +383,7 @@ export class OfferService {
         offerId: offer._id.toString(),
         nftId: nft._id.toString(),
         buyerId: offer.buyerId.toString(),
-        sellerId: sellerObjectId.toString(),
+        sellerId: sellerId.toString(),
         grossAmountGrams: gross.toString(),
         netPayoutGrams: netPayout.toString(),
         platformFeeGrams: platformFee.toString(),
@@ -382,13 +393,145 @@ export class OfferService {
     });
   }
 
+  // Reject offer
+  public async rejectSingleItemOffer(
+    input: RejectSingleItemOfferInput
+  ): Promise<OfferRejectionSummary> {
+    const { offerId, sellerId, nftId } = input;
+    return this.runInTransaction(async (session) => {
+      const now = new Date();
+      const offer = await Offer.findOne({
+        _id: offerId,
+        status: "pending",
+        expiresAt: { $gt: now }
+      }).session(session);
+      if (!offer) {
+        throw AppError.notFound("Offer not found or has already expired");
+      }
+      if (!offer.nftId) {
+        throw AppError.badRequest("Offer does not contain an associated NFT");
+      }
+      if (nftId && !offer.nftId.equals(nftId)) {
+        throw AppError.badRequest("Offer does not match the provided NFT ID");
+      }
+      const nft = await Nft.findById(offer.nftId).session(session);
+      validateNftForRejection(nft, sellerId);
+      const escrow = await EscrowAccount.findOne({
+        _id: offer.escrowId,
+        status: "held"
+      }).session(session);
+      if (!escrow) {
+        throw AppError.badRequest("Escrow not found or is in an invalid state");
+      }
+      await Offer.updateOne({ _id: offer._id }, { $set: { status: "rejected" } }, { session });
+      await EscrowAccount.updateOne(
+        { _id: escrow._id },
+        {
+          $set: {
+            sellerId,
+            status: "refunded",
+            settledAt: now
+          }
+        },
+        { session }
+      );
+      const refundAmountLong = toLong(escrow.grossAmountGrams);
+      await User.updateOne(
+        { _id: escrow.buyerId },
+        {
+          $inc: { availableBalance: refundAmountLong }
+        },
+        { session }
+      );
+      const refundLedgerEntry = this.buildLedgerEntry({
+        referenceId: escrow._id,
+        userId: escrow.buyerId,
+        account: "available",
+        type: "escrow_refund",
+        direction: "credit",
+        amountGrams: refundAmountLong,
+        now
+      });
+      await LedgerEntry.insertMany([refundLedgerEntry], { session });
+      return {
+        offerId: offer._id.toString(),
+        nftId: nft._id.toString(),
+        buyerId: offer.buyerId.toString(),
+        sellerId: sellerId.toString(),
+        refundedAmountGrams: escrow.grossAmountGrams.toString(),
+        status: "rejected"
+      };
+    });
+  }
+
+  // Expire pending offers and refund escrow
+  public async expirePendingOffers(offerIds?: (Types.ObjectId | string)[]): Promise<number> {
+    const now = new Date();
+    const query: Record<string, any> = {
+      status: "pending",
+      expiresAt: { $lte: now }
+    };
+    if (offerIds && offerIds.length > 0) {
+      query._id = { $in: offerIds };
+    }
+    return this.runInTransaction(async (session) => {
+      const expiredOffers = await Offer.find(query).session(session);
+      if (expiredOffers.length === 0) {
+        return 0;
+      }
+      const expiredOfferIds = expiredOffers.map((o) => o._id);
+      const expiredEscrowIds = expiredOffers.map((o) => o.escrowId);
+      await Offer.updateMany(
+        { _id: { $in: expiredOfferIds } },
+        { $set: { status: "expired" } },
+        { session }
+      );
+      const heldEscrows = await EscrowAccount.find({
+        _id: { $in: expiredEscrowIds },
+        status: "held"
+      }).session(session);
+      if (heldEscrows.length > 0) {
+        const activeEscrowIds = heldEscrows.map((e) => e._id);
+        await EscrowAccount.updateMany(
+          { _id: { $in: activeEscrowIds } },
+          { $set: { status: "refunded", settledAt: now } },
+          { session }
+        );
+        const userBulkOps = heldEscrows.map((escrow) => ({
+          updateOne: {
+            filter: { _id: escrow.buyerId },
+            update: {
+              $inc: { availableBalance: toLong(escrow.grossAmountGrams) }
+            }
+          }
+        }));
+        await User.bulkWrite(userBulkOps, { session });
+        const refundLedgerEntries = heldEscrows.map((escrow) =>
+          this.buildLedgerEntry({
+            referenceId: escrow._id,
+            userId: escrow.buyerId,
+            account: "available",
+            type: "escrow_refund",
+            direction: "credit",
+            amountGrams: toLong(escrow.grossAmountGrams),
+            now
+          })
+        );
+        await LedgerEntry.insertMany(refundLedgerEntries, { session });
+      }
+      return expiredOffers.length;
+    });
+  }
+
   // Get all offers
   public async getAllOffers(filter: OfferFilterQuery = {}): Promise<IOffer[]> {
+    await this.expirePendingOffers();
     return Offer.find(filter).lean<IOffer[]>();
   }
 
   // Get offer by id
   public async getOfferById(id: string): Promise<IOffer> {
+    await this.expirePendingOffers([id]);
     const offer = await Offer.findById(id).lean<IOffer | null>();
     if (!offer) {
       throw AppError.notFound("Offer not found");

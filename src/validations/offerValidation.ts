@@ -32,7 +32,13 @@ export const createOfferSchema = z.object({
 });
 
 export const acceptOfferBodySchema = z.object({
-  sellerId: objectIdSchema
+  sellerId: objectIdSchema,
+  nftId: objectIdSchema.optional()
+});
+
+export const rejectOfferBodySchema = z.object({
+  sellerId: objectIdSchema,
+  nftId: objectIdSchema.optional()
 });
 
 export const offerFilterQuerySchema = z.object({
