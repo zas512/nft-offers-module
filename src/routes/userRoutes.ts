@@ -1,12 +1,11 @@
-import { Router } from "express";
 import { getUser, getUsers, getUsersWithNfts } from "../controllers/index.js";
-import { validate } from "../middlewares/validateMiddleware.js";
+import { createApiRouter } from "../utils/routeHelper.js";
 import { userParamSchema } from "../validations/index.js";
 
-const router = Router();
+const api = createApiRouter("/api/users", "Users");
 
-router.get("/", getUsers);
-router.get("/with-nfts", getUsersWithNfts);
-router.get("/:id", validate({ params: userParamSchema }), getUser);
+api.get("/", { summary: "Get all registered users" }, getUsers);
+api.get("/with-nfts", { summary: "Get all users with their owned NFTs" }, getUsersWithNfts);
+api.get("/:id", { summary: "Get user by ID", validate: { params: userParamSchema } }, getUser);
 
-export default router;
+export default api.router;

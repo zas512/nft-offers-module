@@ -1,11 +1,18 @@
-import { Router } from "express";
 import { getNftByIdHandler, getNfts } from "../controllers/index.js";
-import { validate } from "../middlewares/validateMiddleware.js";
+import { createApiRouter } from "../utils/routeHelper.js";
 import { nftFilterQuerySchema, nftParamSchema } from "../validations/index.js";
 
-const router = Router();
+const api = createApiRouter("/api/nfts", "NFTs");
 
-router.get("/", validate({ query: nftFilterQuerySchema }), getNfts);
-router.get("/:id", validate({ params: nftParamSchema }), getNftByIdHandler);
+api.get(
+  "/",
+  { summary: "Get all NFTs with optional filters", validate: { query: nftFilterQuerySchema } },
+  getNfts
+);
+api.get(
+  "/:id",
+  { summary: "Get NFT by ID", validate: { params: nftParamSchema } },
+  getNftByIdHandler
+);
 
-export default router;
+export default api.router;
