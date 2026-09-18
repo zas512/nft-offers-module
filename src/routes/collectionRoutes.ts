@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { getCollectionById, getCollections, getCollectionsWithNfts } from "../controllers/index.js";
 import { validate } from "../middlewares/validateMiddleware.js";
-import { idParamSchema } from "../validations/commonValidation.js";
+import { idParamSchema } from "../validations/index.js";
 
 const router = Router();
 
