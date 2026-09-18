@@ -8,8 +8,6 @@ import apiRoutes from "./src/routes/index.js";
 import { logger, requestFlowLogger } from "./src/utils/logger.js";
 
 const app = express();
-const PORT = process.env.PORT || 5000;
-
 app.disable("x-powered-by");
 app.use(express.json());
 app.use(requestFlowLogger);
@@ -20,13 +18,11 @@ app.use(errorHandler);
 
 try {
   await connectDb();
-  app.listen(PORT, () => {
-    logger.info(`Server running on http://localhost:${PORT}`);
-    logger.info(`Swagger documentation available at http://localhost:${PORT}/docs`);
+  app.listen(5000, () => {
+    logger.info("Server running on http://localhost:5000");
+    logger.info("Swagger documentation available at http://localhost:5000/docs");
   });
 } catch (err) {
   logger.error("Failed to start server:", err);
   process.exit(1);
 }
-
-export default app;

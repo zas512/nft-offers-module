@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { objectIdSchema } from "./commonValidation.js";
 
-export const createCollectionBodySchema = z.object({
+z.object({
   name: z
     .string()
     .trim()

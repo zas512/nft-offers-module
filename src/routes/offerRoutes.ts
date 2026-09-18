@@ -1,12 +1,12 @@
 import { Router } from "express";
-import { acceptOffer, createOffer, getOffer, getOffers } from "../controllers/offerController.js";
+import { acceptOffer, createOffer, getOffer, getOffers } from "../controllers/index.js";
 import { validate } from "../middlewares/validateMiddleware.js";
-import { idParamSchema } from "../validations/commonValidation.js";
+import { idParamSchema } from "../validations/index.js";
 import {
   acceptOfferBodySchema,
   createSingleItemOfferBodySchema,
   offerFilterQuerySchema
-} from "../validations/offerValidation.js";
+} from "../validations/index.js";
 
 const router = Router();
 

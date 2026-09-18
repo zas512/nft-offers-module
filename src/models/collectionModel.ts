@@ -1,7 +1,5 @@
 import mongoose, { Schema, type Model } from "mongoose";
-import type { CreateCollectionInput, ICollection } from "../types/index.js";
-import { AppError } from "../utils/appError.js";
-import { createCollectionBodySchema } from "../validations/collectionValidation.js";
+import type { ICollection } from "../types/index.js";
 
 export const collectionSchema = new Schema<ICollection>(
   {
@@ -41,22 +39,4 @@ export const collectionSchema = new Schema<ICollection>(
 export const Collection: Model<ICollection> =
   mongoose.models.Collection ||
   mongoose.model<ICollection>("Collection", collectionSchema, "collections");
-export const CollectionModel = Collection;
-export function createCollectionDocument(input: CreateCollectionInput): Partial<ICollection> {
-  const creatorIdStr =
-    typeof input.creatorId === "string" ? input.creatorId : input.creatorId?.toString();
-  const parseResult = createCollectionBodySchema.safeParse({
-    ...input,
-    creatorId: creatorIdStr
-  });
-  if (!parseResult.success) {
-    throw AppError.badRequest(`INVALID_COLLECTION_DATA: ${parseResult.error.issues[0]?.message}`);
-  }
-  const { name, creatorId, platformFeeBps, royaltyFeeBps } = parseResult.data;
-  return {
-    name,
-    creatorId: new mongoose.Types.ObjectId(creatorId),
-    platformFeeBps,
-    royaltyFeeBps
-  };
-}
+

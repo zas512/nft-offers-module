@@ -1,6 +1,5 @@
 import mongoose, { Schema, type Model } from "mongoose";
-import { ESCROW_STATUSES, type CreateEscrowInput, type IEscrowAccount } from "../types/index.js";
-import { AppError } from "../utils/appError.js";
+import { ESCROW_STATUSES, type IEscrowAccount } from "../types/index.js";
 
 export { ESCROW_STATUSES };
 
@@ -68,78 +67,3 @@ escrowAccountSchema.index({ buyerId: 1 });
 export const EscrowAccount: Model<IEscrowAccount> =
   mongoose.models.EscrowAccount ||
   mongoose.model<IEscrowAccount>("EscrowAccount", escrowAccountSchema, "escrow_accounts");
-export const EscrowModel = EscrowAccount;
-
-function toObjectId(
-  id: string | mongoose.Types.ObjectId | null | undefined
-): mongoose.Types.ObjectId | null {
-  if (!id) return null;
-  return typeof id === "string" ? new mongoose.Types.ObjectId(id) : id;
-}
-
-export function createEscrowDocument(input: CreateEscrowInput): Partial<IEscrowAccount> {
-  const {
-    offerId,
-    buyerId,
-    sellerId = null,
-    creatorId = null,
-    grossAmountGrams,
-    platformFeeBps = 0,
-    royaltyFeeBps = 0,
-    status = "held",
-    settledAt = null
-  } = input;
-  if (!offerId || !mongoose.Types.ObjectId.isValid(offerId)) {
-    throw AppError.badRequest("INVALID_OFFER_ID");
-  }
-  if (!buyerId || !mongoose.Types.ObjectId.isValid(buyerId)) {
-    throw AppError.badRequest("INVALID_BUYER_ID");
-  }
-  if (sellerId && !mongoose.Types.ObjectId.isValid(sellerId)) {
-    throw AppError.badRequest("INVALID_SELLER_ID");
-  }
-  if (creatorId && !mongoose.Types.ObjectId.isValid(creatorId)) {
-    throw AppError.badRequest("INVALID_CREATOR_ID");
-  }
-  if (
-    typeof grossAmountGrams !== "number" ||
-    grossAmountGrams <= 0 ||
-    !Number.isSafeInteger(grossAmountGrams)
-  ) {
-    throw AppError.badRequest("INVALID_GROSS_AMOUNT");
-  }
-  if (
-    typeof platformFeeBps !== "number" ||
-    platformFeeBps < 0 ||
-    platformFeeBps > 10000 ||
-    !Number.isInteger(platformFeeBps)
-  ) {
-    throw AppError.badRequest("INVALID_PLATFORM_FEE_BPS");
-  }
-  if (
-    typeof royaltyFeeBps !== "number" ||
-    royaltyFeeBps < 0 ||
-    royaltyFeeBps > 10000 ||
-    !Number.isInteger(royaltyFeeBps)
-  ) {
-    throw AppError.badRequest("INVALID_ROYALTY_FEE_BPS");
-  }
-  if (!ESCROW_STATUSES.includes(status)) {
-    throw AppError.badRequest("INVALID_STATUS");
-  }
-  let settledDate: Date | null = null;
-  if (settledAt) {
-    settledDate = settledAt instanceof Date ? settledAt : new Date(settledAt);
-  }
-  return {
-    offerId: toObjectId(offerId)!,
-    buyerId: toObjectId(buyerId)!,
-    sellerId: toObjectId(sellerId),
-    creatorId: toObjectId(creatorId),
-    grossAmountGrams,
-    platformFeeBps,
-    royaltyFeeBps,
-    status,
-    settledAt: settledDate
-  };
-}

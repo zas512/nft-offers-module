@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { userService } from "../services/userService.js";
+import { userService } from "../services/index.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { logger } from "../utils/logger.js";
 

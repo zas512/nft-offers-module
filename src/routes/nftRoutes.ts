@@ -1,7 +1,7 @@
 import { Router } from "express";
-import { getNftByIdHandler, getNfts } from "../controllers/nftController.js";
+import { getNftByIdHandler, getNfts } from "../controllers/index.js";
 import { validate } from "../middlewares/validateMiddleware.js";
-import { nftFilterQuerySchema, nftParamSchema } from "../validations/nftValidation.js";
+import { nftFilterQuerySchema, nftParamSchema } from "../validations/index.js";
 
 const router = Router();
 

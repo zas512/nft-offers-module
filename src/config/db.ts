@@ -1,4 +1,4 @@
-import mongoose, { type ClientSession, type Connection } from "mongoose";
+import mongoose, { type Connection } from "mongoose";
 
 export class Database {
   private static instance: Database | null = null;
@@ -29,15 +29,7 @@ export class Database {
       throw err;
     }
   }
-  public getConnection(): Connection {
-    if (!this.connection || mongoose.connection.readyState !== 1) {
-      throw new Error("Database is not connected.");
-    }
-    return this.connection;
-  }
-  public async startSession(): Promise<ClientSession> {
-    return mongoose.startSession();
-  }
+
   public async close(): Promise<void> {
     if (mongoose.connection.readyState !== 0) {
       await mongoose.disconnect();
@@ -49,7 +41,5 @@ export class Database {
 
 export const database = Database.getInstance();
 export const connectDb = () => database.connect();
-export const getConnection = () => database.getConnection();
-export const startSession = () => database.startSession();
 export const closeDb = () => database.close();
 export { mongoose };

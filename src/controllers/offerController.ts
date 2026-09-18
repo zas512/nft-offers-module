@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { offerService } from "../services/offerService.js";
+import { offerService } from "../services/index.js";
 import type { OfferFilterQuery } from "../types/index.js";
 import { AppError } from "../utils/appError.js";
 import { asyncHandler } from "../utils/asyncHandler.js";

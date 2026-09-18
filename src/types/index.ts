@@ -93,29 +93,6 @@ export interface ILedgerEntry {
   createdAt: Date;
 }
 
-export interface CreateUserInput {
-  name: string;
-  walletAddress?: string | null;
-  telegramId?: string | null;
-  initialBalanceGrams?: number;
-}
-
-export interface CreateCollectionInput {
-  name: string;
-  creatorId: string | Types.ObjectId;
-  platformFeeBps?: number;
-  royaltyFeeBps?: number;
-}
-
-export interface CreateNftInput {
-  collectionId: string | Types.ObjectId;
-  ownerId: string | Types.ObjectId;
-  tokenId: number;
-  name: string;
-  status?: NftStatus;
-  isLocked?: boolean;
-}
-
 export interface CreateSingleItemOfferInput {
   buyerId: string;
   nftId: string;
@@ -126,29 +103,6 @@ export interface CreateSingleItemOfferInput {
 export interface AcceptSingleItemOfferInput {
   offerId: string;
   sellerId: string;
-}
-
-export type SellerIdType = string | Types.ObjectId | null;
-
-export interface CreateEscrowInput {
-  offerId: string | Types.ObjectId;
-  buyerId: string | Types.ObjectId;
-  sellerId?: SellerIdType;
-  creatorId?: string | Types.ObjectId | null;
-  grossAmountGrams: number;
-  platformFeeBps?: number;
-  royaltyFeeBps?: number;
-  status?: EscrowStatus;
-  settledAt?: Date | null;
-}
-
-export interface CreateLedgerInput {
-  referenceId: string | Types.ObjectId;
-  userId?: string | Types.ObjectId | null;
-  account: string;
-  type: string;
-  direction: LedgerDirection;
-  amountGrams: number;
 }
 
 export interface NftFilterQuery {

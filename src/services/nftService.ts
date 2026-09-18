@@ -30,5 +30,3 @@ export class NftService {
 }
 
 export const nftService = new NftService();
-export const getAllNfts = (filter?: NftFilterQuery) => nftService.getAllNfts(filter);
-export const getNftById = (id: string) => nftService.getNftById(id);

@@ -14,7 +14,7 @@ import { logger } from "../utils/logger.js";
 import {
   acceptOfferBodySchema,
   createSingleItemOfferBodySchema
-} from "../validations/offerValidation.js";
+} from "../validations/index.js";
 
 export class OfferService {
   public async createSingleItemOffer(
@@ -410,10 +410,3 @@ export class OfferService {
 }
 
 export const offerService = new OfferService();
-
-export const createSingleItemOffer = (input: CreateSingleItemOfferInput) =>
-  offerService.createSingleItemOffer(input);
-export const getAllOffers = (filter?: OfferFilterQuery) => offerService.getAllOffers(filter);
-export const getOfferById = (id: string) => offerService.getOfferById(id);
-export const acceptSingleItemOffer = (input: AcceptSingleItemOfferInput) =>
-  offerService.acceptSingleItemOffer(input);

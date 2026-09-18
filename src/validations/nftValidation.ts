@@ -2,7 +2,7 @@ import { z } from "zod";
 import { NFT_STATUSES } from "../types/index.js";
 import { objectIdSchema } from "./commonValidation.js";
 
-export const createNftBodySchema = z.object({
+z.object({
   collectionId: objectIdSchema,
   ownerId: objectIdSchema,
   tokenId: z.number().int().min(1, "Token ID must be a positive integer"),

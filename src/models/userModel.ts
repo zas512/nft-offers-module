@@ -1,7 +1,5 @@
 import mongoose, { Schema, type Model } from "mongoose";
-import type { CreateUserInput, IUser } from "../types/index.js";
-import { AppError } from "../utils/appError.js";
-import { createUserBodySchema } from "../validations/userValidation.js";
+import type { IUser } from "../types/index.js";
 
 export const userSchema = new Schema<IUser>(
   {
@@ -40,18 +38,3 @@ export const userSchema = new Schema<IUser>(
 
 export const User: Model<IUser> =
   mongoose.models.User || mongoose.model<IUser>("User", userSchema, "users");
-export const UserModel = User;
-
-export function createUserDocument(input: CreateUserInput): Partial<IUser> {
-  const parseResult = createUserBodySchema.safeParse(input);
-  if (!parseResult.success) {
-    throw AppError.badRequest(`INVALID_USER_DATA: ${parseResult.error.issues[0]?.message}`);
-  }
-  const { name, walletAddress, telegramId, initialBalanceGrams } = parseResult.data;
-  return {
-    name,
-    walletAddress: walletAddress ? walletAddress.toLowerCase().trim() : null,
-    telegramId: telegramId ? String(telegramId).trim() : null,
-    availableBalance: initialBalanceGrams
-  };
-}

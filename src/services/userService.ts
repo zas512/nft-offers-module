@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { User } from "../models/userModel.js";
+import { User } from "../models/index.js";
 import type { IUser } from "../types/index.js";
 import { AppError } from "../utils/appError.js";
 
@@ -32,6 +32,3 @@ export class UserService {
 }
 
 export const userService = new UserService();
-export const getAllUsers = () => userService.getAllUsers();
-export const getAllUsersWithNfts = () => userService.getAllUsersWithNfts();
-export const getUserById = (id: string) => userService.getUserById(id);

@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { Collection } from "../models/collectionModel.js";
+import { Collection } from "../models/index.js";
 import type { ICollection } from "../types/index.js";
 import { AppError } from "../utils/appError.js";
 
@@ -44,7 +44,3 @@ export class CollectionService {
 }
 
 export const collectionService = new CollectionService();
-export const getAllCollections = () => collectionService.getAllCollections();
-export const getAllCollectionsWithNfts = () => collectionService.getAllCollectionsWithNfts();
-export const getCollectionByIdWithNfts = (id: string) =>
-  collectionService.getCollectionByIdWithNfts(id);

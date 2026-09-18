@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-import { nftService } from "../services/nftService.js";
+import { nftService } from "../services/index.js";
 import type { NftFilterQuery } from "../types/index.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { logger } from "../utils/logger.js";
