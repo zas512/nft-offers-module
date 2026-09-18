@@ -11,6 +11,7 @@ export const OFFER_STATUSES = [
   "expired",
   "invalidated"
 ] as const;
+
 export type OfferStatus = (typeof OFFER_STATUSES)[number];
 
 export const ESCROW_STATUSES = ["held", "settled", "refunded", "cancelled"] as const;
@@ -18,6 +19,21 @@ export type EscrowStatus = (typeof ESCROW_STATUSES)[number];
 
 export const NFT_STATUSES = ["active", "listed", "burned", "transferred"] as const;
 export type NftStatus = (typeof NFT_STATUSES)[number];
+
+export const BPS_DENOMINATOR = 10000n;
+export const BPS_BASE = 10000;
+
+export const LEDGER_ACCOUNTS = ["available", "treasury"] as const;
+export type LedgerAccount = (typeof LEDGER_ACCOUNTS)[number];
+
+export const LEDGER_TYPES = [
+  "escrow_lock",
+  "seller_payout",
+  "platform_fee",
+  "royalty_fee",
+  "escrow_refund"
+] as const;
+export type LedgerType = (typeof LEDGER_TYPES)[number];
 
 export const LEDGER_DIRECTIONS = ["credit", "debit"] as const;
 export type LedgerDirection = (typeof LEDGER_DIRECTIONS)[number];
@@ -38,9 +54,6 @@ export interface IUser extends ITimestamps {
 export interface ICollection extends ITimestamps {
   _id: Types.ObjectId;
   name: string;
-  creatorId: Types.ObjectId;
-  platformFeeBps: number;
-  royaltyFeeBps: number;
 }
 
 export interface INft extends ITimestamps {
@@ -70,40 +83,34 @@ export interface IEscrowAccount extends ITimestamps {
   offerId: Types.ObjectId;
   buyerId: Types.ObjectId;
   sellerId: Types.ObjectId | null;
-  creatorId: Types.ObjectId | null;
   grossAmountGrams: number | mongoose.mongo.Long;
   platformFeeBps: number;
   royaltyFeeBps: number;
   status: EscrowStatus;
   settledAt: Date | null;
-  feeConfig?: {
-    platformFeeBps?: number;
-    royaltyFeeBps?: number;
-    creatorId?: Types.ObjectId | null;
-  };
 }
 
 export interface ILedgerEntry {
   _id: Types.ObjectId;
   referenceId: Types.ObjectId;
   userId: Types.ObjectId | null;
-  account: string;
-  type: string;
+  account: LedgerAccount;
+  type: LedgerType;
   direction: LedgerDirection;
   amountGrams: number | mongoose.mongo.Long;
   createdAt: Date;
 }
 
 export interface CreateSingleItemOfferInput {
-  buyerId: string;
-  nftId: string;
-  grossAmountGrams: number;
+  buyerId: Types.ObjectId | string;
+  nftId: Types.ObjectId | string;
+  grossAmountGrams: number | string | bigint;
   expiresAt: string | Date;
 }
 
 export interface AcceptSingleItemOfferInput {
-  offerId: string;
-  sellerId: string;
+  offerId: Types.ObjectId | string;
+  sellerId: Types.ObjectId | string;
 }
 
 export interface NftFilterQuery {
@@ -126,7 +133,7 @@ export interface SingleItemOfferResult {
   sellerId: string;
   collectionId: string;
   nftId: string;
-  grossAmountGrams: number;
+  grossAmountGrams: string;
   status: OfferStatus;
   expiresAt: string;
 }

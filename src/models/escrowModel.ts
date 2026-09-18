@@ -20,11 +20,6 @@ export const escrowAccountSchema = new Schema<IEscrowAccount>(
       ref: "User",
       default: null
     },
-    creatorId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      default: null
-    },
     grossAmountGrams: {
       type: Schema.Types.Mixed,
       required: true

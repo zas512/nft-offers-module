@@ -140,18 +140,12 @@
     {
       "_id": "65f1b2b2b2b2b2b2b2b2b201",
       "name": "Cyber Relics",
-      "creatorId": "65f1a1a1a1a1a1a1a1a1a106",
-      "platformFeeBps": 250,
-      "royaltyFeeBps": 500,
       "createdAt": "2026-02-01T00:00:00.000Z",
       "updatedAt": "2026-02-01T00:00:00.000Z"
     },
     {
       "_id": "65f1b2b2b2b2b2b2b2b2b202",
       "name": "Voxel Beasts",
-      "creatorId": "65f1a1a1a1a1a1a1a1a1a107",
-      "platformFeeBps": 250,
-      "royaltyFeeBps": 750,
       "createdAt": "2026-02-02T00:00:00.000Z",
       "updatedAt": "2026-02-02T00:00:00.000Z"
     }

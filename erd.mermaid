@@ -1,10 +1,8 @@
 erDiagram
-    users ||--o{ collections : "creates"
     users ||--o{ nfts : "owns"
     users ||--o{ offers : "places (buyerId)"
     users ||--o{ escrow_accounts : "funded by (buyerId)"
     users ||--o{ escrow_accounts : "receives (sellerId)"
-    users ||--o{ escrow_accounts : "earns royalty (creatorId)"
     users ||--o{ ledger_entries : "audited under"
 
     collections ||--|{ nfts : "contains"
@@ -29,9 +27,6 @@ erDiagram
     collections {
         ObjectId _id PK
         string name
-        ObjectId creatorId FK
-        int platformFeeBps
-        int royaltyFeeBps
         date createdAt
         date updatedAt
     }
@@ -66,7 +61,6 @@ erDiagram
         ObjectId offerId FK
         ObjectId buyerId FK
         ObjectId sellerId FK
-        ObjectId creatorId FK
         long grossAmountGrams
         int platformFeeBps
         int royaltyFeeBps

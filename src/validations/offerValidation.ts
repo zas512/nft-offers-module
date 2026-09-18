@@ -1,21 +1,25 @@
 import { z } from "zod";
+import { OFFER_STATUSES } from "../types/index.js";
 import { objectIdSchema } from "./commonValidation.js";
 
 export const createOfferSchema = z.object({
   buyerId: objectIdSchema,
   nftId: objectIdSchema,
   grossAmountGrams: z
-    .number({ message: "grossAmountGrams must be a number" })
-    .int("grossAmountGrams must be an integer")
-    .positive("grossAmountGrams must be a positive integer"),
+    .union([
+      z.number().int().positive("grossAmountGrams must be a positive integer"),
+      z.string().regex(/^[1-9]\d*$/, "grossAmountGrams must be a positive integer string"),
+      z.bigint().positive("grossAmountGrams must be a positive integer")
+    ])
+    .transform((val) => val.toString()),
   expiresAt: z
     .union([
       z.iso.datetime({ message: "expiresAt must be a valid ISO 8601 date string" }),
       z.date()
     ])
+    .transform((val) => (val instanceof Date ? val : new Date(val)))
     .refine(
-      (val) => {
-        const date = val instanceof Date ? val : new Date(val);
+      (date) => {
         const time = date.getTime();
         if (Number.isNaN(time)) return false;
         const now = Date.now();
@@ -25,4 +29,15 @@ export const createOfferSchema = z.object({
       },
       { message: "expiresAt must be at least 1 hour and at most 30 days in the future" }
     )
+});
+
+export const acceptOfferBodySchema = z.object({
+  sellerId: objectIdSchema
+});
+
+export const offerFilterQuerySchema = z.object({
+  buyerId: objectIdSchema.optional(),
+  collectionId: objectIdSchema.optional(),
+  nftId: objectIdSchema.optional(),
+  status: z.enum(OFFER_STATUSES).optional()
 });

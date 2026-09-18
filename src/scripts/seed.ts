@@ -24,9 +24,6 @@ interface RawUserData {
 interface RawCollectionData {
   _id: string;
   name: string;
-  creatorId: string;
-  platformFeeBps: number;
-  royaltyFeeBps: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -65,9 +62,6 @@ export async function seedDatabase(): Promise<void> {
   const collections: Partial<ICollection>[] = rawData.collections.map((col) => ({
     _id: new mongoose.Types.ObjectId(col._id),
     name: col.name.trim(),
-    creatorId: new mongoose.Types.ObjectId(col.creatorId),
-    platformFeeBps: col.platformFeeBps,
-    royaltyFeeBps: col.royaltyFeeBps,
     createdAt: new Date(col.createdAt),
     updatedAt: new Date(col.updatedAt)
   }));

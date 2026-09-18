@@ -9,25 +9,6 @@ export const collectionSchema = new Schema<ICollection>(
       trim: true,
       minlength: 1,
       maxlength: 100
-    },
-    creatorId: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true
-    },
-    platformFeeBps: {
-      type: Number,
-      required: true,
-      min: 0,
-      max: 10000,
-      default: 0
-    },
-    royaltyFeeBps: {
-      type: Number,
-      required: true,
-      min: 0,
-      max: 10000,
-      default: 0
     }
   },
   {
@@ -39,4 +20,3 @@ export const collectionSchema = new Schema<ICollection>(
 export const Collection: Model<ICollection> =
   mongoose.models.Collection ||
   mongoose.model<ICollection>("Collection", collectionSchema, "collections");
-
